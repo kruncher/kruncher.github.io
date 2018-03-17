@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Simplified ‘Display’ management for J2ME | Lea Hayes</title>
+<meta property="og:title" content="Simplified ‘Display’ management for J2ME" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Switching between displayable objects such as canvases and alerts can become tricky when working on more complex applications. Code can easily become cluttered with excess “display” and “midlet” references, despite that there is usually only one unique display instance." />
+<meta property="og:description" content="Switching between displayable objects such as canvases and alerts can become tricky when working on more complex applications. Code can easily become cluttered with excess “display” and “midlet” references, despite that there is usually only one unique display instance." />
+<link rel="canonical" href="/2010/03/03/simplified-display-management-for-j2me.html" />
+<meta property="og:url" content="/2010/03/03/simplified-display-management-for-j2me.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2010-03-03T00:00:00+00:00" />
+<script type="application/ld+json">
+{"name":null,"description":"Switching between displayable objects such as canvases and alerts can become tricky when working on more complex applications. Code can easily become cluttered with excess “display” and “midlet” references, despite that there is usually only one unique display instance.","author":null,"@type":"BlogPosting","url":"/2010/03/03/simplified-display-management-for-j2me.html","publisher":null,"image":null,"headline":"Simplified ‘Display’ management for J2ME","dateModified":"2010-03-03T00:00:00+00:00","datePublished":"2010-03-03T00:00:00+00:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2010/03/03/simplified-display-management-for-j2me.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Simplified &#39;Display&#39; management for J2ME</h1>
+    <p class="post__meta">
+      <time datetime="2010-03-03T00:00:00+00:00" itemprop="datePublished">
+        
+        Mar 3, 2010
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>Switching between displayable objects such as canvases and alerts can become tricky when
+working on more complex applications. Code can easily become cluttered with excess
+“display” and “midlet” references, despite that there is usually only one unique display
+instance.</p>
+
+<p>This mess can be cleaned up by creating some static helper methods which provide instant
+access to the display instance without the need to maintain either midlet or display
+references.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">DisplayManager</span> <span class="o">{</span>
+
+    <span class="c1">// The one and only display object.</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Display</span> <span class="n">display</span><span class="o">;</span>
+
+    <span class="c1">// Get the one and only display object.</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Display</span> <span class="nf">getDisplay</span><span class="o">()</span> <span class="o">{</span> <span class="k">return</span> <span class="n">display</span><span class="o">;</span> <span class="o">}</span>
+
+    <span class="c1">// A one off call is required to prepare the display manager.</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">initialize</span><span class="o">(</span><span class="n">Display</span> <span class="n">display</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="o">(</span><span class="n">DisplayManager</span><span class="o">.</span><span class="na">display</span> <span class="o">=</span> <span class="n">display</span><span class="o">).</span><span class="na">getCurrent</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Several utility methods can then allow for tidier source code.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">DisplayManager</span> <span class="o">{</span>
+    <span class="o">...</span>
+
+    <span class="c1">// Get displayable object that is visible on the handset screen.</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Displayable</span> <span class="nf">getVisible</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">display</span><span class="o">.</span><span class="na">getCurrent</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="c1">// Helper method for cleaner code that is usually inlined by the compiler.</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">setCurrent</span><span class="o">(</span><span class="n">Displayable</span> <span class="n">d</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">display</span><span class="o">.</span><span class="na">setCurrent</span><span class="o">(</span><span class="n">current</span> <span class="o">=</span> <span class="n">d</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Without some sort of custom mechanism it is also very difficult to determine what
+displayable object was last assigned.</p>
+
+<p>I suspect that <code class="highlighter-rouge">Display.getCurrent</code> will instantly spring to mind, but that function does
+not necessarily retrieve the last display which was shown with a corresponding
+<code class="highlighter-rouge">Display.setCurrent</code> call. Here is a typical example. Let us assume that there are three
+displayable objects A, B and C, and that object A is already shown on the handset display.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">(</span><span class="n">Display</span> <span class="n">display</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Displayable</span> <span class="n">firstTest</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="na">getCurrent</span><span class="o">();</span>
+    <span class="n">display</span><span class="o">.</span><span class="na">setCurrent</span><span class="o">(</span><span class="n">B</span><span class="o">);</span>
+    <span class="n">display</span><span class="o">.</span><span class="na">setCurrent</span><span class="o">(</span><span class="n">C</span><span class="o">);</span>
+    <span class="n">Displayable</span> <span class="n">secondTest</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="na">getCurrent</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The value of <code class="highlighter-rouge">firstTest</code> is a reference of displayable object A, as we may expect. However,
+after two display changes, the value of <code class="highlighter-rouge">secondTest</code> is still a reference to displayable
+object A. This is because the display will not usually be switched until a specific event
+is handled by the underlying J2ME framework.</p>
+
+<p>A simple solution to this problem (if this is a problem for your requirements) is to
+create a helper class which keeps track of the last display change. With such a class it
+is easy to determine which displayable is currently visible to the user and which
+displayable was previously set.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">DisplayManager</span> <span class="o">{</span>
+    <span class="o">...</span>
+
+    <span class="c1">// The current displayable that is either visible or will be soon.</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Displayable</span> <span class="n">current</span><span class="o">;</span>
+
+    <span class="c1">// Get displayable object that is visible on the handset screen.</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Displayable</span> <span class="nf">getVisible</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">display</span><span class="o">.</span><span class="na">getCurrent</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>There is, however, a glitch with the <code class="highlighter-rouge">setCurrent(Alert, Displayable)</code> method because after
+an alert has been discarded, the underlying J2ME framework will automatically revert to
+the next specified display without updating our current reference. I overcame this problem
+by introducing a custom <code class="highlighter-rouge">Alert</code> class, along with an additional helper method in
+<code class="highlighter-rouge">DisplayManager</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">DisplayManager</span> <span class="o">{</span>
+    <span class="o">...</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">setCurrent</span><span class="o">(</span><span class="n">Alert</span> <span class="n">d</span><span class="o">,</span> <span class="n">Displayable</span> <span class="n">nextDisplayable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Place reference to next displayable object inside custom alert object.</span>
+        <span class="n">d</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">nextDisplayable</span><span class="o">;</span>
+        <span class="c1">// Switch display using the new 'setCurrent' method.</span>
+        <span class="n">setCurrent</span><span class="o">(</span><span class="n">d</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The custom <code class="highlighter-rouge">Alert</code> class can be used in exactly the same way as the regular <code class="highlighter-rouge">Alert</code> class.
+This version is able to automatically update the display manager. There are also several
+utility methods which make alerts far easier to use:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Alert</span> <span class="kd">extends</span> <span class="n">javax</span><span class="o">.</span><span class="na">microedition</span><span class="o">.</span><span class="na">lcdui</span><span class="o">.</span><span class="na">Alert</span> <span class="kd">implements</span> <span class="n">CommandListener</span> <span class="o">{</span>
+
+    <span class="c1">// Reference to next displayable object, made protected so that the display</span>
+    <span class="c1">// manager is able to adjust it.</span>
+    <span class="kd">protected</span> <span class="n">Displayable</span> <span class="n">next</span><span class="o">;</span>
+
+    <span class="c1">// Standard constructors.</span>
+    <span class="kd">public</span> <span class="nf">Alert</span><span class="o">(</span><span class="n">String</span> <span class="n">title</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">title</span><span class="o">);</span>
+        <span class="n">setTimeout</span><span class="o">(</span><span class="n">Alert</span><span class="o">.</span><span class="na">FOREVER</span><span class="o">);</span>
+        <span class="n">setCommandListener</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">Alert</span><span class="o">(</span><span class="n">String</span> <span class="n">title</span><span class="o">,</span> <span class="n">String</span> <span class="n">alertText</span><span class="o">,</span> <span class="n">Image</span> <span class="n">alertImage</span><span class="o">,</span> <span class="n">AlertType</span> <span class="n">alertType</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">title</span><span class="o">,</span> <span class="n">alertText</span><span class="o">,</span> <span class="n">alertImage</span><span class="o">,</span> <span class="n">alertType</span><span class="o">);</span>
+        <span class="n">setTimeout</span><span class="o">(</span><span class="n">Alert</span><span class="o">.</span><span class="na">FOREVER</span><span class="o">);</span>
+        <span class="n">setCommandListener</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="c1">// Additional constructor for simplicity.</span>
+    <span class="kd">public</span> <span class="nf">Alert</span><span class="o">(</span><span class="n">String</span> <span class="n">title</span><span class="o">,</span> <span class="n">String</span> <span class="n">alertText</span><span class="o">,</span> <span class="n">AlertType</span> <span class="n">alertType</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">title</span><span class="o">,</span> <span class="n">alertText</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">alertType</span><span class="o">);</span>
+        <span class="n">setTimeout</span><span class="o">(</span><span class="n">Alert</span><span class="o">.</span><span class="na">FOREVER</span><span class="o">);</span>
+        <span class="n">setCommandListener</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="c1">// Default command listener will update display manager upon close.</span>
+    <span class="c1">// A custom command listener can either clear or restore the next</span>
+    <span class="c1">// displayable object manually.</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">commandAction</span><span class="o">(</span><span class="n">Command</span> <span class="n">c</span><span class="o">,</span> <span class="n">Displayable</span> <span class="n">d</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">c</span> <span class="o">==</span> <span class="n">DISMISS_COMMAND</span><span class="o">)</span>
+            <span class="n">showNextDisplayable</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="c1">// Helper show methods.</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">show</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">DisplayManager</span><span class="o">.</span><span class="na">setCurrent</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">show</span><span class="o">(</span><span class="n">Displayable</span> <span class="n">nextDisplayable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">DisplayManager</span><span class="o">.</span><span class="na">setCurrent</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">nextDisplayable</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">showNextDisplayable</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">next</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">DisplayManager</span><span class="o">.</span><span class="na">setCurrent</span><span class="o">(</span><span class="n">next</span><span class="o">);</span>
+        <span class="n">next</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">Displayable</span> <span class="nf">getNextDisplayable</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">next</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">clearNextDisplayable</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">next</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>In order for this to work, the display manager must be initialized when your MIDlet is
+first initialized. Simply adding the following line at the start of your MIDlet
+constructor should be sufficient:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DisplayManager</span><span class="o">.</span><span class="na">initialize</span><span class="o">(</span><span class="n">Display</span><span class="o">.</span><span class="na">getDisplay</span><span class="o">(</span><span class="k">this</span><span class="o">));</span>
+</code></pre></div></div>
+
+<p>An alert can then be shown as shown below; please make sure that you use the <code class="highlighter-rouge">Alert</code> class
+from your namespace, or alternatively give your class a different name such as <code class="highlighter-rouge">MyAlert</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Display alert message.</span>
+<span class="k">new</span> <span class="nf">Alert</span><span class="o">(</span><span class="s">"Greeting"</span><span class="o">,</span> <span class="s">"Hello World!"</span><span class="o">,</span> <span class="n">AlertType</span><span class="o">.</span><span class="na">INFO</span><span class="o">).</span><span class="na">show</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+<span class="c1">// Get current displayable object (The alert object).</span>
+<span class="n">Displayable</span> <span class="n">current</span> <span class="o">=</span> <span class="n">DisplayManager</span><span class="o">.</span><span class="na">getCurrent</span><span class="o">();</span>
+<span class="c1">// Get visible displayable object (The A object).</span>
+<span class="n">Displayable</span> <span class="n">visible</span> <span class="o">=</span> <span class="n">DisplayManager</span><span class="o">.</span><span class="na">getVisible</span><span class="o">();</span>
+</code></pre></div></div>
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/j2me">j2me</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/java">java</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

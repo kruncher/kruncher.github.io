@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Designer friendly component scripts with Unity events | Lea Hayes</title>
+<meta property="og:title" content="Designer friendly component scripts with Unity events" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Unity recently introduced a serializable UnityEvent class which allows scripts to expose events in the inspector allowing designers to wire up handlers without coding. This is a really powerful feature because it allows developers to implement components that can now be assembled much more freely by designers… almost like a basic form of visual scripting." />
+<meta property="og:description" content="Unity recently introduced a serializable UnityEvent class which allows scripts to expose events in the inspector allowing designers to wire up handlers without coding. This is a really powerful feature because it allows developers to implement components that can now be assembled much more freely by designers… almost like a basic form of visual scripting." />
+<link rel="canonical" href="/2015/03/22/designer-friendly-component-scripts-with-unity-events.html" />
+<meta property="og:url" content="/2015/03/22/designer-friendly-component-scripts-with-unity-events.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-03-22T00:00:00+00:00" />
+<script type="application/ld+json">
+{"name":null,"description":"Unity recently introduced a serializable UnityEvent class which allows scripts to expose events in the inspector allowing designers to wire up handlers without coding. This is a really powerful feature because it allows developers to implement components that can now be assembled much more freely by designers… almost like a basic form of visual scripting.","author":null,"@type":"BlogPosting","url":"/2015/03/22/designer-friendly-component-scripts-with-unity-events.html","publisher":null,"image":null,"headline":"Designer friendly component scripts with Unity events","dateModified":"2015-03-22T00:00:00+00:00","datePublished":"2015-03-22T00:00:00+00:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2015/03/22/designer-friendly-component-scripts-with-unity-events.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Designer friendly component scripts with Unity events</h1>
+    <p class="post__meta">
+      <time datetime="2015-03-22T00:00:00+00:00" itemprop="datePublished">
+        
+        Mar 22, 2015
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>Unity recently introduced a serializable <code class="highlighter-rouge">UnityEvent</code> class which allows scripts to expose
+events in the inspector allowing designers to wire up handlers without coding. This is a
+really powerful feature because it allows developers to implement components that can now
+be assembled much more freely by designers… almost like a basic form of visual scripting.</p>
+
+<p>Events that have no parameters can be exposed using the ready made <code class="highlighter-rouge">UnityEvent</code> class.
+Here is an example of a <code class="highlighter-rouge">MonoBehaviour</code> that exposes an event that is triggered after the
+specified delay has elapsed:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">DelayedEvent</span> <span class="p">:</span> <span class="n">MonoBehaviour</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">float</span> <span class="n">delayInSeconds</span> <span class="p">=</span> <span class="m">1f</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">repeat</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">int</span> <span class="n">maximumRepeatCount</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">UnityEvent</span> <span class="n">triggeredEvent</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="kt">float</span> <span class="n">DelayInSeconds</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">delayInSeconds</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">delayInSeconds</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">bool</span> <span class="n">Repeat</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">repeat</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">repeat</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">MaximumRepeatCount</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">maximumRepeatCount</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">maximumRepeatCount</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">public</span> <span class="n">UnityEvent</span> <span class="n">TriggeredEvent</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">triggeredEvent</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnEnable</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nf">StartCoroutine</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nf">StartDelay</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnTriggered</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">TriggeredEvent</span><span class="p">.</span><span class="nf">Invoke</span><span class="p">();</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="n">IEnumerator</span> <span class="nf">StartDelay</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">count</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+
+        <span class="k">do</span> <span class="p">{</span>
+            <span class="k">yield</span> <span class="k">return</span> <span class="k">new</span> <span class="nf">WaitForSeconds</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">DelayInSeconds</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="nf">OnTriggered</span><span class="p">();</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">MaximumRepeatCount</span> <span class="p">&gt;</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
+               <span class="n">count</span> <span class="p">+=</span> <span class="m">1</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">while</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">Repeat</span> <span class="p">&amp;&amp;</span> <span class="n">count</span> <span class="p">&lt;=</span> <span class="k">this</span><span class="p">.</span><span class="n">MaximumRepeatCount</span><span class="p">);</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="n">enabled</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Alone this component doesn’t seem particularly useful; however, if you implement action
+components, like the following, then it becomes possible to wire them up using the
+inspector.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">SpawnPrefabAction</span> <span class="p">:</span> <span class="n">MonoBehaviour</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">GameObject</span> <span class="n">prefab</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">Transform</span> <span class="n">parent</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">inheritPosition</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">inheritRotation</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">inheritScale</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="n">GameObject</span> <span class="n">Prefab</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">prefab</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">prefab</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">public</span> <span class="n">Transform</span> <span class="n">Parent</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">parent</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">parent</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">bool</span> <span class="n">InheritPosition</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">inheritPosition</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">inheritPosition</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">bool</span> <span class="n">InheritRotation</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">inheritRotation</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">inheritRotation</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">bool</span> <span class="n">InheritScale</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">inheritScale</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">inheritScale</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">ExecuteAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// In a real-world implementation I would suggest using</span>
+        <span class="c1">// a pooling solution rather than making new ones each time.</span>
+        <span class="kt">var</span> <span class="n">instanceTransform</span> <span class="p">=</span> <span class="nf">Instantiate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">prefab</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">Parent</span><span class="p">).</span><span class="n">transform</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">InheritPosition</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">instanceTransform</span><span class="p">.</span><span class="n">position</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">position</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">InheritRotation</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">instanceTransform</span><span class="p">.</span><span class="n">rotation</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">rotation</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">InheritScale</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">instanceTransform</span><span class="p">.</span><span class="n">localScale</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">localScale</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">PlaySoundEffectAction</span> <span class="p">:</span> <span class="n">MonoBehaviour</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">AudioClip</span> <span class="n">clip</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">float</span> <span class="n">volume</span> <span class="p">=</span> <span class="m">1f</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="n">AudioClip</span> <span class="n">Clip</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">clip</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">clip</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">float</span> <span class="n">Volume</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">volume</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">volume</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Clamp01</span><span class="p">(</span><span class="k">value</span><span class="p">);</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">ExecuteAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">AudioSource</span><span class="p">.</span><span class="nf">PlayClipAtPoint</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">Clip</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">position</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">Volume</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Which can then be wired up like demonstrated below using the inspector:</p>
+
+<p><img src="/assets/blog/2015/01/22/evil-spider-spawner.png" alt="Spawning evil spiders at delayed intervals" /></p>
+
+<p>Sometimes we need to be able to provide additional information about an event. Unity
+provides a selection of generic <code class="highlighter-rouge">UnityEvent</code> implementations that take varying quantities
+of custom parameters. Due to limitations with the Unity serialization mechanism it is
+necessary to create a little boilerplate for each specialization.</p>
+
+<p>The following demonstrates one way to create a component to maintain the health of an
+actor (any object that can take damage):</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">[Serializable]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">HealthDamagedEvent</span> <span class="p">:</span> <span class="n">UnityEvent</span><span class="p">&lt;</span><span class="n">HealthComponent</span><span class="p">,</span> <span class="kt">float</span><span class="p">,</span> <span class="kt">object</span><span class="p">&gt;</span> <span class="p">{</span> <span class="p">}</span>
+<span class="na">[Serializable]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">HealthDestroyedEvent</span> <span class="p">:</span> <span class="n">UnityEvent</span><span class="p">&lt;</span><span class="n">HealthComponent</span><span class="p">,</span> <span class="kt">object</span><span class="p">&gt;</span> <span class="p">{</span> <span class="p">}</span>
+
+
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">HealthComponent</span> <span class="p">:</span> <span class="n">MonoBehaviour</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">float</span> <span class="n">initialHealth</span> <span class="p">=</span> <span class="m">100f</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">HealthDamagedEvent</span> <span class="n">damageTakenEvent</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">HealthDestroyedEvent</span> <span class="n">destroyedEvent</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+
+    <span class="k">private</span> <span class="kt">float</span> <span class="n">health</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="kt">float</span> <span class="n">InitialHealth</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">initialHealth</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">initialHealth</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">float</span> <span class="n">Health</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">health</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">health</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">bool</span> <span class="n">IsAlive</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">Health</span> <span class="p">&gt;</span> <span class="m">0f</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">bool</span> <span class="n">IsDead</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">Health</span> <span class="p">&lt;=</span> <span class="m">0f</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    
+    <span class="k">public</span> <span class="n">HealthDamagedEvent</span> <span class="n">DamageTakenEvent</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">damageTakenEvent</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+    
+    <span class="k">public</span> <span class="n">HealthDestroyedEvent</span> <span class="n">DestroyedEvent</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">destroyedEvent</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">Start</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nf">RestoreInitialHealth</span><span class="p">();</span>
+    <span class="p">}</span>
+
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">RestoreInitialHealth</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">Health</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">InitialHealth</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">TakeDamage</span><span class="p">(</span><span class="kt">float</span> <span class="n">damage</span><span class="p">,</span> <span class="kt">object</span> <span class="n">actuator</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">IsDead</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Already dead! please no more!</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="n">Health</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Max</span><span class="p">(</span><span class="m">0f</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">Health</span> <span class="p">-</span> <span class="n">damage</span><span class="p">);</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="n">DamageTakenEvent</span><span class="p">.</span><span class="nf">Invoke</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">damage</span><span class="p">,</span> <span class="n">actuator</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">IsDead</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">DestroyedEvent</span><span class="p">.</span><span class="nf">Invoke</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">actuator</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>For more complex objects it is useful to create empty objects to group related actions
+together and to workaround the limitation whereby <code class="highlighter-rouge">UnityEvent</code> cannot determine which
+component to invoke when the game object contains multiple components of the same type:</p>
+
+<p><img src="/assets/blog/2015/01/22/health-component.png" alt="Screenshot of health component with sub-objects to group actions" /></p>
+
+<p>Finally I’ll demonstrate how you might create a component that inflicts damage upon
+whatever it collides with. Collision can be controlled using the physics layer matrix
+feature of Unity although you could obviously add various constraints to your components.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">[Serializable]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">DamagerDamagedTargetEvent</span> <span class="p">:</span> <span class="n">UnityEvent</span><span class="p">&lt;</span><span class="n">DamagerComponent</span><span class="p">,</span> <span class="kt">float</span><span class="p">,</span> <span class="n">HealthComponent</span><span class="p">&gt;</span> <span class="p">{</span> <span class="p">}</span>
+<span class="na">[Serializable]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">DamagerDestroyedTargetEvent</span> <span class="p">:</span> <span class="n">UnityEvent</span><span class="p">&lt;</span><span class="n">DamagerComponent</span><span class="p">,</span> <span class="n">HealthComponent</span><span class="p">&gt;</span> <span class="p">{</span> <span class="p">}</span>
+
+
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">DamagerComponent</span> <span class="p">:</span> <span class="n">MonoBehaviour</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">float</span> <span class="n">damageAmount</span> <span class="p">=</span> <span class="m">10f</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">DamagerDamagedTargetEvent</span> <span class="n">damagedTargetEvent</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">DamagerDestroyedTargetEvent</span> <span class="n">destroyedTargetEvent</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="kt">float</span> <span class="n">DamageAmount</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">damageAmount</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">damageAmount</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    
+    <span class="k">public</span> <span class="n">DamagerDamagedTargetEvent</span> <span class="n">DamagedTargetEvent</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">damagedTargetEvent</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+    
+    <span class="k">public</span> <span class="n">DamagerDestroyedTargetEvent</span> <span class="n">DestroyedTargetEvent</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">destroyedTargetEvent</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnCollisionEnter2D</span><span class="p">(</span><span class="n">Collision2D</span> <span class="n">other</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">health</span> <span class="p">=</span> <span class="n">other</span><span class="p">.</span><span class="n">gameObject</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">HealthComponent</span><span class="p">&gt;();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">health</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">&amp;&amp;</span> <span class="n">health</span><span class="p">.</span><span class="n">IsAlive</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">health</span><span class="p">.</span><span class="nf">TakeDamage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">DamageAmount</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">gameObject</span><span class="p">);</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="n">DamagedTargetEvent</span><span class="p">.</span><span class="nf">Invoke</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">DamageAmount</span><span class="p">,</span> <span class="n">health</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">health</span><span class="p">.</span><span class="n">IsDead</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="n">DestroyedTargetEvent</span><span class="p">.</span><span class="nf">Invoke</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">health</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I hope that this post is useful for people that are looking for a lightweight approach for
+wiring up their components visually. I used this approach in my most recent client project
+and they said that they found the game’s components flexible and easy to use.</p>
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

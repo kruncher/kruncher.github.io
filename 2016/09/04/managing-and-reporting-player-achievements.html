@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Managing and reporting player achievements | Lea Hayes</title>
+<meta property="og:title" content="Managing and reporting player achievements" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="When implementing goals such as achievements I like to keep the detection logic separate from the main game logic wherever possible. Otherwise it is easy to end up with spaghetti where achievements are being reported all over the place. One way to separate this cross cutting concern is to have each goal monitor the game’s state to detect success or even failure." />
+<meta property="og:description" content="When implementing goals such as achievements I like to keep the detection logic separate from the main game logic wherever possible. Otherwise it is easy to end up with spaghetti where achievements are being reported all over the place. One way to separate this cross cutting concern is to have each goal monitor the game’s state to detect success or even failure." />
+<link rel="canonical" href="/2016/09/04/managing-and-reporting-player-achievements.html" />
+<meta property="og:url" content="/2016/09/04/managing-and-reporting-player-achievements.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-09-04T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"When implementing goals such as achievements I like to keep the detection logic separate from the main game logic wherever possible. Otherwise it is easy to end up with spaghetti where achievements are being reported all over the place. One way to separate this cross cutting concern is to have each goal monitor the game’s state to detect success or even failure.","author":null,"@type":"BlogPosting","url":"/2016/09/04/managing-and-reporting-player-achievements.html","publisher":null,"image":null,"headline":"Managing and reporting player achievements","dateModified":"2016-09-04T00:00:00+01:00","datePublished":"2016-09-04T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2016/09/04/managing-and-reporting-player-achievements.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Managing and reporting player achievements</h1>
+    <p class="post__meta">
+      <time datetime="2016-09-04T00:00:00+01:00" itemprop="datePublished">
+        
+        Sep 4, 2016
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>When implementing goals such as achievements I like to keep the detection logic separate
+from the main game logic wherever possible. Otherwise it is easy to end up with spaghetti
+where achievements are being reported all over the place. One way to separate this cross
+cutting concern is to have each goal monitor the game’s state to detect success or even
+failure.</p>
+
+<p>Let’s take the example of an endless game where the player has to endure the game’s
+challenges for as long as possible. When the player eventually succumbs to failure a
+screen appears showing their score and time. There are lots of opportunities for recording
+achievements.</p>
+
+<p>A general purpose goal type can be defined to observe and report basic score accolades
+such as “Score X points in a single run”:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">[CreateAssetMenu(menuName = "Project/Goals/Score Goal")]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">ScoreGoalAsset</span> <span class="p">:</span> <span class="n">ScriptableGoal</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">Inject</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">IPlayerProfile</span> <span class="n">playerProfile</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">int</span> <span class="n">score</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+
+
+    <span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnActivated</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">playerProfile</span><span class="p">.</span><span class="n">GameRecorded</span> <span class="p">+=</span> <span class="k">this</span><span class="p">.</span><span class="n">PlayerProfile_GameRecorded</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnDeactivated</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">playerProfile</span><span class="p">.</span><span class="n">GameRecorded</span> <span class="p">-=</span> <span class="k">this</span><span class="p">.</span><span class="n">PlayerProfile_GameRecorded</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">PlayerProfile_GameRecorded</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">playerProfile</span><span class="p">.</span><span class="n">LastScore</span> <span class="p">&gt;=</span> <span class="k">this</span><span class="p">.</span><span class="n">score</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">Status</span> <span class="p">=</span> <span class="n">GoalStatus</span><span class="p">.</span><span class="n">Completed</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<blockquote>
+
+  <p><strong>Note</strong> - The <code class="highlighter-rouge">[Inject]</code> attribute in the above example is a part of the <a href="https://github.com/modesttree/Zenject">Zenject</a>
+dependency injection framework which I highly recommend for Unity projects.</p>
+
+</blockquote>
+
+<p>When the <code class="highlighter-rouge">ScoreGoalAsset</code> changes it’s status to <code class="highlighter-rouge">GoalStatus.Completed</code> the goal manager
+will trigger a goal completed event allowing for things like rewards, achievements, etc
+to be handled. The goal asset’s only purpose is to define and monitor the progress of a
+goal.</p>
+
+<p>So at this point you might be wondering; okay, so how are achievements actually reported?
+Well there are a few ways that this logic can be implemented. It could be implemented as
+a rewarder or as a more general service. I chose to implement a general purpose service
+which monitors for goal completion and then reports achievement progress if a platform
+specific achievement identifier is associated with that goal name. In a nutshell:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">GoalAchievementReporting</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IGoalManager</span> <span class="n">goalManager</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IAchievementReporter</span> <span class="n">achievementReporter</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IGoalAchievementNameResolver</span> <span class="n">goalAchievementNameResolver</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">isRunning</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="nf">GoalAchievementReporting</span><span class="p">(</span>
+        <span class="n">IGoalManager</span> <span class="n">goalManager</span><span class="p">,</span>
+        <span class="n">IAchievementReporter</span> <span class="n">achievementReporter</span><span class="p">,</span>
+        <span class="n">IGoalAchievementNameResolver</span> <span class="n">goalAchievementNameResolver</span>
+    <span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">goalManager</span> <span class="p">=</span> <span class="n">goalManager</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">achievementReporter</span> <span class="p">=</span> <span class="n">achievementReporter</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">goalAchievementNameResolver</span> <span class="p">=</span> <span class="n">goalAchievementNameResolver</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">GoalManager_GoalProgressed</span><span class="p">(</span><span class="n">IGoal</span> <span class="n">goal</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">achievementName</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">goalAchievementNameResolver</span><span class="p">.</span><span class="nf">ResolveAchievementName</span><span class="p">(</span><span class="n">goal</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(!</span><span class="kt">string</span><span class="p">.</span><span class="nf">IsNullOrEmpty</span><span class="p">(</span><span class="n">achievementName</span><span class="p">))</span> <span class="p">{</span>
+            <span class="c1">// A goal can of course have sub-goals; in such cases partial completion will</span>
+            <span class="c1">// be reported rather than simply unlocking the achievement.</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">achievementReporter</span><span class="p">.</span><span class="nf">ReportAchievementProgress</span><span class="p">(</span><span class="n">achievementName</span><span class="p">,</span> <span class="n">goal</span><span class="p">.</span><span class="n">Progress</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Start</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(!</span><span class="k">this</span><span class="p">.</span><span class="n">isRunning</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">isRunning</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">goalManager</span><span class="p">.</span><span class="n">GoalProgressed</span> <span class="p">+=</span> <span class="k">this</span><span class="p">.</span><span class="n">GoalManager_GoalProgressed</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Stop</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">isRunning</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">isRunning</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">goalManager</span><span class="p">.</span><span class="n">GoalProgressed</span> <span class="p">-=</span> <span class="k">this</span><span class="p">.</span><span class="n">GoalManager_GoalProgressed</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>For a second example let’s look at how we might handle consecutive scores:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">[CreateAssetMenu(menuName = "Project/Goals/Consecutive Score Goal")]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">ConsecutiveScoreGoalAsset</span> <span class="p">:</span> <span class="n">ScriptableGoal</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">Inject</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">IPlayerProfile</span> <span class="n">playerProfile</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">int</span> <span class="n">score</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">int</span> <span class="n">consecutiveCount</span> <span class="p">=</span> <span class="m">1</span><span class="p">;</span>
+
+
+    <span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnActivated</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">playerProfile</span><span class="p">.</span><span class="n">GameRecorded</span> <span class="p">+=</span> <span class="k">this</span><span class="p">.</span><span class="n">PlayerProfile_GameRecorded</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnDeactivated</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">playerProfile</span><span class="p">.</span><span class="n">GameRecorded</span> <span class="p">-=</span> <span class="k">this</span><span class="p">.</span><span class="n">PlayerProfile_GameRecorded</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">PlayerProfile_GameRecorded</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">recentScores</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">playerProfile</span><span class="p">.</span><span class="n">RecentScores</span>
+            <span class="p">.</span><span class="nf">Take</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">consecutiveCount</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">ToArray</span><span class="p">();</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">recentScores</span><span class="p">.</span><span class="n">Length</span> <span class="p">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="n">consecutiveCount</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">recentScores</span><span class="p">.</span><span class="nf">All</span><span class="p">(</span><span class="n">recentScore</span> <span class="p">=&gt;</span> <span class="n">recentScore</span> <span class="p">&gt;=</span> <span class="k">this</span><span class="p">.</span><span class="n">score</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">Status</span> <span class="p">=</span> <span class="n">GoalStatus</span><span class="p">.</span><span class="n">Completed</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The keen eye might notice that the <code class="highlighter-rouge">ConsecutiveScoreGoalAsset</code> goal from above can be used
+to define the same goals that could be defined using <code class="highlighter-rouge">ScoreGoalAsset</code> from the first
+example.</p>
+
+<p>Each goal asset can make reference to a series of <code class="highlighter-rouge">ScriptableGoalObserver</code> assets which
+can initiate custom logic for various goal events… such as completion or failure. For
+example, you might define a <code class="highlighter-rouge">GoalOutfitRewarder</code> which rewards the player with some
+fashion for scoring highly:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">[CreateAssetMenu("Project/Goals/Rewarders/Outfit Rewarder")]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">GoalOutfitRewarder</span> <span class="p">:</span> <span class="n">ScriptableGoalObserver</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">outfitName</span> <span class="p">=</span> <span class="s">""</span><span class="p">;</span>
+
+
+    <span class="p">[</span><span class="n">Inject</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">IPlayerProfile</span> <span class="n">playerProfile</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnGoalStatusChanged</span><span class="p">(</span><span class="n">IGoal</span> <span class="n">goal</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">goal</span><span class="p">.</span><span class="n">Status</span> <span class="p">==</span> <span class="n">GoalStatus</span><span class="p">.</span><span class="n">Completed</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">playerProfile</span><span class="p">.</span><span class="nf">UnlockOutfit</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">outfitName</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Goals can be managed however desired and for more advanced games they can pop in and out
+of existence based upon the player’s progress in the game. The same mechanism can thus be
+used to manage achievements, quests, challanges, etc.</p>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Custom editor controls in Unity - Part 3: Input control | Lea Hayes</title>
+<meta property="og:title" content="Custom editor controls in Unity - Part 3: Input control" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="More often than not editor controls will have some sort of value that is shown and editable visually. In this post I am going to walk you through the creation of a custom control that allows some flags to be toggled using a simple grid." />
+<meta property="og:description" content="More often than not editor controls will have some sort of value that is shown and editable visually. In this post I am going to walk you through the creation of a custom control that allows some flags to be toggled using a simple grid." />
+<link rel="canonical" href="/2015/08/26/custom-editor-controls-in-unity-part-3.html" />
+<meta property="og:url" content="/2015/08/26/custom-editor-controls-in-unity-part-3.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-08-26T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"More often than not editor controls will have some sort of value that is shown and editable visually. In this post I am going to walk you through the creation of a custom control that allows some flags to be toggled using a simple grid.","author":null,"@type":"BlogPosting","url":"/2015/08/26/custom-editor-controls-in-unity-part-3.html","publisher":null,"image":null,"headline":"Custom editor controls in Unity - Part 3: Input control","dateModified":"2015-08-26T00:00:00+01:00","datePublished":"2015-08-26T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2015/08/26/custom-editor-controls-in-unity-part-3.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Custom editor controls in Unity - Part 3: Input control</h1>
+    <p class="post__meta">
+      <time datetime="2015-08-26T00:00:00+01:00" itemprop="datePublished">
+        
+        Aug 26, 2015
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>More often than not editor controls will have some sort of value that is shown and
+editable visually. In this post I am going to walk you through the creation of a custom
+control that allows some flags to be toggled using a simple grid.</p>
+
+<p>Here is what the finished control will look like:</p>
+
+<p><img src="/assets/blog/2015/08/26/flag-toggle-grid.png" alt="Screenshot of the finished control" /></p>
+
+<p>A lot of people don’t realize that you can omit the prefix label from controls by
+providing <code class="highlighter-rouge">GUIContent.none</code> for the label argument:</p>
+
+<p><img src="/assets/blog/2015/08/26/no-label.png" alt="Screenshot of finished control without label" /></p>
+
+<p>When there are mixed values the control is rendered with grayed out cells (relevant when
+working with Unity’s <code class="highlighter-rouge">SerializedProperty</code> API):</p>
+
+<p><img src="/assets/blog/2015/08/26/mixed-values.png" alt="Screenshot of finished control with mixed values" /></p>
+
+<p>Controls that allow the user to modify an input value tend to use the following pattern:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">this</span><span class="p">.</span><span class="n">inputValue</span> <span class="p">=</span> <span class="n">SomeGUI</span><span class="p">.</span><span class="nf">SomeInputControl</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">inputValue</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>The Unity editor API provides convenience functions to monitor controls for changes rather
+than having to compare old and new values:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">EditorGUI</span><span class="p">.</span><span class="nf">BeginChangeCheck</span><span class="p">();</span>
+<span class="k">this</span><span class="p">.</span><span class="n">inputValue</span> <span class="p">=</span> <span class="n">SomeGUI</span><span class="p">.</span><span class="nf">SomeInputControl</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">inputValue</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">EditorGUI</span><span class="p">.</span><span class="nf">EndChangeCheck</span><span class="p">())</span> <span class="p">{</span>
+    <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"The input value was changed!"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>To keep things simple our custom control will encode multiple flags into an integer
+variable using bitwise operations. I have defined several helper functions to aid with
+this a little although their implementation is not the focus of this post:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">static</span> <span class="kt">int</span> <span class="nf">GetFlagMask</span><span class="p">(</span><span class="kt">int</span> <span class="n">flagIndex</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="n">flagIndex</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">private</span> <span class="k">static</span> <span class="kt">bool</span> <span class="nf">GetFlagState</span><span class="p">(</span><span class="kt">int</span> <span class="k">value</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagIndex</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="k">value</span> <span class="p">&amp;</span> <span class="nf">GetFlagMask</span><span class="p">(</span><span class="n">flagIndex</span><span class="p">))</span> <span class="p">!=</span> <span class="m">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">private</span> <span class="k">static</span> <span class="kt">int</span> <span class="nf">ModifyFlagState</span><span class="p">(</span><span class="kt">int</span> <span class="k">value</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagIndex</span><span class="p">,</span> <span class="kt">bool</span> <span class="k">on</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">on</span>
+        <span class="p">?</span> <span class="k">value</span> <span class="p">&amp;</span> <span class="p">~</span><span class="nf">GetFlagMask</span><span class="p">(</span><span class="n">flagIndex</span><span class="p">)</span>
+        <span class="p">:</span> <span class="k">value</span> <span class="p">|</span> <span class="nf">GetFlagMask</span><span class="p">(</span><span class="n">flagIndex</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In the same way as before (with the button control) we will begin by creating the manual
+version of the control.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="kt">int</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">Rect</span> <span class="n">position</span><span class="p">,</span> <span class="n">GUIContent</span> <span class="n">label</span><span class="p">,</span> <span class="kt">int</span> <span class="k">value</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagCount</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">flagCount</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Min</span><span class="p">(</span><span class="m">32</span><span class="p">,</span> <span class="n">flagCount</span><span class="p">);</span>
+
+    <span class="kt">int</span> <span class="n">controlID</span> <span class="p">=</span> <span class="n">GUIUtility</span><span class="p">.</span><span class="nf">GetControlID</span><span class="p">(</span><span class="n">s_FlagToggleGridHint</span><span class="p">,</span> <span class="n">FocusType</span><span class="p">.</span><span class="n">Passive</span><span class="p">,</span> <span class="n">position</span><span class="p">);</span>
+
+    <span class="c1">// Should a prefix label be shown before the control?</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">label</span> <span class="p">!=</span> <span class="n">GUIContent</span><span class="p">.</span><span class="n">none</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">position</span> <span class="p">=</span> <span class="n">EditorGUI</span><span class="p">.</span><span class="nf">PrefixLabel</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">controlID</span><span class="p">,</span> <span class="n">label</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kt">float</span> <span class="n">cellWidth</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Floor</span><span class="p">(</span><span class="n">position</span><span class="p">.</span><span class="n">width</span> <span class="p">/</span> <span class="n">flagCount</span><span class="p">);</span>
+
+    <span class="k">switch</span> <span class="p">(</span><span class="n">Event</span><span class="p">.</span><span class="n">current</span><span class="p">.</span><span class="nf">GetTypeForControl</span><span class="p">(</span><span class="n">controlID</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="n">EventType</span><span class="p">.</span><span class="n">MouseDown</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">GUI</span><span class="p">.</span><span class="n">enabled</span> <span class="p">&amp;&amp;</span> <span class="n">position</span><span class="p">.</span><span class="nf">Contains</span><span class="p">(</span><span class="n">Event</span><span class="p">.</span><span class="n">current</span><span class="p">.</span><span class="n">mousePosition</span><span class="p">))</span> <span class="p">{</span>
+                <span class="c1">// Calculate zero-based index of the flag's column.</span>
+                <span class="kt">float</span> <span class="n">controlRelativeMouseX</span> <span class="p">=</span> <span class="n">Event</span><span class="p">.</span><span class="n">current</span><span class="p">.</span><span class="n">mousePosition</span><span class="p">.</span><span class="n">x</span> <span class="p">-</span> <span class="n">position</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+                <span class="kt">int</span> <span class="n">flagIndex</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">FloorToInt</span><span class="p">(</span><span class="n">controlRelativeMouseX</span> <span class="p">/</span> <span class="n">cellWidth</span><span class="p">);</span>
+
+                <span class="c1">// Modify the value by toggling the flag.</span>
+                <span class="k">value</span> <span class="p">=</span> <span class="nf">ModifyFlagState</span><span class="p">(</span><span class="k">value</span><span class="p">,</span> <span class="n">flagIndex</span><span class="p">,</span> <span class="p">!</span><span class="nf">GetFlagState</span><span class="p">(</span><span class="k">value</span><span class="p">,</span> <span class="n">flagIndex</span><span class="p">));</span>
+                <span class="c1">// Indicate that the value was changed using the Unity API.</span>
+                <span class="n">GUI</span><span class="p">.</span><span class="n">changed</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+
+                <span class="n">Event</span><span class="p">.</span><span class="n">current</span><span class="p">.</span><span class="nf">Use</span><span class="p">();</span>
+            <span class="p">}</span>
+            <span class="k">break</span><span class="p">;</span>
+
+        <span class="k">case</span> <span class="n">EventType</span><span class="p">.</span><span class="n">Repaint</span><span class="p">:</span>
+            <span class="n">Rect</span> <span class="n">cellPosition</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Rect</span><span class="p">(</span><span class="n">position</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">position</span><span class="p">.</span><span class="n">y</span> <span class="p">+</span> <span class="m">2</span><span class="p">,</span> <span class="n">cellWidth</span> <span class="p">-</span> <span class="m">1</span><span class="p">,</span> <span class="n">position</span><span class="p">.</span><span class="n">height</span> <span class="p">-</span> <span class="m">4</span><span class="p">);</span>
+            <span class="n">Color</span> <span class="n">restoreColor</span> <span class="p">=</span> <span class="n">GUI</span><span class="p">.</span><span class="n">color</span><span class="p">;</span>
+
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">flagCount</span><span class="p">;</span> <span class="p">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// We can check to see whether the control has been marked</span>
+                <span class="c1">// as having mixed values. This is applicable when editing</span>
+                <span class="c1">// the same property on multiple objects at the same time</span>
+                <span class="c1">// since the value might be different on both objects.</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">EditorGUI</span><span class="p">.</span><span class="n">showMixedValue</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="c1">// Show all cells in grey when there are differing values.</span>
+                    <span class="n">GUI</span><span class="p">.</span><span class="n">color</span> <span class="p">=</span> <span class="nf">GetFlagState</span><span class="p">(</span><span class="k">value</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="p">?</span> <span class="k">new</span> <span class="nf">Color</span><span class="p">(</span><span class="m">0f</span><span class="p">,</span> <span class="m">0.5f</span><span class="p">,</span> <span class="m">0f</span><span class="p">)</span> <span class="p">:</span> <span class="n">Color</span><span class="p">.</span><span class="n">grey</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">else</span> <span class="p">{</span>
+                    <span class="c1">// Show set flags with green and unset flags with black.</span>
+                    <span class="n">GUI</span><span class="p">.</span><span class="n">color</span> <span class="p">=</span> <span class="nf">GetFlagState</span><span class="p">(</span><span class="k">value</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="p">?</span> <span class="n">Color</span><span class="p">.</span><span class="n">green</span> <span class="p">:</span> <span class="n">Color</span><span class="p">.</span><span class="n">black</span><span class="p">;</span>
+                <span class="p">}</span>
+
+                <span class="n">GUI</span><span class="p">.</span><span class="n">skin</span><span class="p">.</span><span class="n">box</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="n">cellPosition</span><span class="p">,</span> <span class="n">GUIContent</span><span class="p">.</span><span class="n">none</span><span class="p">,</span> <span class="n">controlID</span><span class="p">);</span>
+
+                <span class="c1">// Advance to position of the next cell.</span>
+                <span class="n">cellPosition</span><span class="p">.</span><span class="n">x</span> <span class="p">=</span> <span class="n">cellPosition</span><span class="p">.</span><span class="n">xMax</span> <span class="p">+</span> <span class="m">1</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">GUI</span><span class="p">.</span><span class="n">color</span> <span class="p">=</span> <span class="n">restoreColor</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="k">value</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We can then create an overload to accept a string label:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="kt">int</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">Rect</span> <span class="n">position</span><span class="p">,</span> <span class="kt">string</span> <span class="n">label</span><span class="p">,</span> <span class="kt">int</span> <span class="k">value</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagCount</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="nf">TempContent</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="k">value</span><span class="p">,</span> <span class="n">flagCount</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Some of Unity’s built-in controls include an overload for working with values via the
+<code class="highlighter-rouge">SerializedProperty</code> API. It is straightforward to include similar support for custom
+controls since Unity provides API’s to assist with this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">Rect</span> <span class="n">position</span><span class="p">,</span> <span class="n">SerializedProperty</span> <span class="n">property</span><span class="p">,</span> <span class="n">GUIContent</span> <span class="n">label</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagCount</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">EditorGUI</span><span class="p">.</span><span class="nf">BeginProperty</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">property</span><span class="p">);</span>
+
+    <span class="n">EditorGUI</span><span class="p">.</span><span class="nf">BeginChangeCheck</span><span class="p">();</span>
+    <span class="kt">int</span> <span class="n">newValue</span> <span class="p">=</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">property</span><span class="p">.</span><span class="n">intValue</span><span class="p">,</span> <span class="n">flagCount</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">EditorGUI</span><span class="p">.</span><span class="nf">EndChangeCheck</span><span class="p">())</span> <span class="p">{</span>
+        <span class="n">property</span><span class="p">.</span><span class="n">intValue</span> <span class="p">=</span> <span class="n">newValue</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">EditorGUI</span><span class="p">.</span><span class="nf">EndProperty</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">Rect</span> <span class="n">position</span><span class="p">,</span> <span class="n">SerializedProperty</span> <span class="n">property</span><span class="p">,</span> <span class="kt">string</span> <span class="n">label</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagCount</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">property</span><span class="p">,</span> <span class="nf">TempContent</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">flagCount</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And then finally we can add the layout implementations of the control functions:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="kt">int</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">GUIContent</span> <span class="n">label</span><span class="p">,</span> <span class="kt">int</span> <span class="k">value</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagCount</span><span class="p">,</span> <span class="k">params</span> <span class="n">GUILayoutOption</span><span class="p">[]</span> <span class="n">options</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Rect</span> <span class="n">position</span> <span class="p">=</span> <span class="n">GUILayoutUtility</span><span class="p">.</span><span class="nf">GetRect</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">42</span><span class="p">,</span> <span class="n">options</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">flagCount</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">static</span> <span class="kt">int</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="kt">string</span> <span class="n">label</span><span class="p">,</span> <span class="kt">int</span> <span class="k">value</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagCount</span><span class="p">,</span> <span class="k">params</span> <span class="n">GUILayoutOption</span><span class="p">[]</span> <span class="n">options</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="nf">TempContent</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="k">value</span><span class="p">,</span> <span class="n">flagCount</span><span class="p">,</span> <span class="n">options</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">SerializedProperty</span> <span class="n">property</span><span class="p">,</span> <span class="n">GUIContent</span> <span class="n">label</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagCount</span><span class="p">,</span> <span class="k">params</span> <span class="n">GUILayoutOption</span><span class="p">[]</span> <span class="n">options</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Rect</span> <span class="n">position</span> <span class="p">=</span> <span class="n">GUILayoutUtility</span><span class="p">.</span><span class="nf">GetRect</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">42</span><span class="p">,</span> <span class="n">options</span><span class="p">);</span>
+    <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">property</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">flagCount</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">SerializedProperty</span> <span class="n">property</span><span class="p">,</span> <span class="kt">string</span> <span class="n">label</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flagCount</span><span class="p">,</span> <span class="k">params</span> <span class="n">GUILayoutOption</span><span class="p">[]</span> <span class="n">options</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">property</span><span class="p">,</span> <span class="nf">TempContent</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">flagCount</span><span class="p">,</span> <span class="n">options</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>See: <a href="/2015/08/27/custom-editor-controls-in-unity-part-4.html">Part 4: Property drawers</a></p>
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/imgui">imgui</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

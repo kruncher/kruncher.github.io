@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Publishing Unity game to Chrome Web Store | Lea Hayes</title>
+<meta property="og:title" content="Publishing Unity game to Chrome Web Store" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A couple of days ago I decided to publish a demo version of Munchy Bunny! There were several motivations behind this:" />
+<meta property="og:description" content="A couple of days ago I decided to publish a demo version of Munchy Bunny! There were several motivations behind this:" />
+<link rel="canonical" href="/2012/05/08/publishing-game-to-chrome-web-store.html" />
+<meta property="og:url" content="/2012/05/08/publishing-game-to-chrome-web-store.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2012-05-08T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"A couple of days ago I decided to publish a demo version of Munchy Bunny! There were several motivations behind this:","author":null,"@type":"BlogPosting","url":"/2012/05/08/publishing-game-to-chrome-web-store.html","publisher":null,"image":null,"headline":"Publishing Unity game to Chrome Web Store","dateModified":"2012-05-08T00:00:00+01:00","datePublished":"2012-05-08T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2012/05/08/publishing-game-to-chrome-web-store.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Publishing Unity game to Chrome Web Store</h1>
+    <p class="post__meta">
+      <time datetime="2012-05-08T00:00:00+01:00" itemprop="datePublished">
+        
+        May 8, 2012
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>A couple of days ago I decided to publish a demo version of Munchy Bunny! There were
+several motivations behind this:</p>
+
+<ul>
+  <li>
+    <p>A useful opportunity to learn how the Chrome WebStore works.</p>
+  </li>
+  <li>
+    <p>Promote interest in <em>Munchy Bunny!</em></p>
+  </li>
+  <li>
+    <p>Allow developers that have shown an interest in the game from the Unity community to
+take it for a spin!</p>
+  </li>
+  <li>
+    <p>Provide a demonstration of the <a href="http://rotorz.com/unity/tile-system/">tile system</a> that Rotorz Limited hope to release soon.</p>
+  </li>
+</ul>
+
+<p>The overall process was relatively straightforward and I wanted to share my experiences in
+this post. Some of this will apply to all Chrome WebStore extensions, however some will
+apply more to those who are developing games using the <a href="http://www.unity3d.com/">Unity 3D</a> game engine.</p>
+
+<p><img src="/assets/blog/2012/05/08/marquee-1400-560.jpg" alt="" /></p>
+
+<p><em>Munchy Bunny!</em> needed to be altered in various ways so that it would work more
+comfortably within a web browser environment. This included the removal of iOS specific
+features like leaderboards and achievements. Unless I can find a generic leaderboard and
+achievement solution (suggestions would be welcome!) that will work outside of game center,
+I may need to create an alternative solution for a future commercial release of the
+extension.</p>
+
+<p>I also spent a little time tweaking quality settings for the webplayer version to reduce
+the overall size of the built game.</p>
+
+<p>From the build settings I experimented with both the native client (for Chrome) and the
+usual Unity WebPlayer. I feel that these each have their own advantages and disadvantages.
+I think that for me the most significant advantage that the Unity WebPlayer has over NaCl
+is that it supports joystick input. I am a big fan of the Microsoft Xbox 360 Controller
+for Windows and I love the fact that it can be used to play games that I make!</p>
+
+<p>I uploaded and tested both the WebPlayer and the NaCl version. The NaCl version was
+approximately 120MB uncompressed (about 32MB compressed if memory serves). The WebPlayer
+version is approximately 8MB (both compressed and uncompressed). I was initially led to
+believe (from forums) that a limit of 10MB was in place, but this did not seem to be the
+case. Again, please feel free to comment if you are aware of any size limitations for
+extensions.</p>
+
+<p>I customized the HTML file that was generated by adding a background and colour scheme
+in-keeping with the game. As far as the application is concerned, that pretty much just
+leaves the following:</p>
+
+<ul>
+  <li>
+    <p>Create a manifest file to describe the extension to the Chrome WebStore.</p>
+  </li>
+  <li>
+    <p>Take some screenshots (or provide video preview on YouTube).</p>
+  </li>
+  <li>
+    <p>Write a description and provide artwork for icon.</p>
+  </li>
+  <li>
+    <p>Publish extension for testing.</p>
+  </li>
+  <li>
+    <p>Finally, unpublish extension and then publish for release.</p>
+  </li>
+</ul>
+
+<p>I used the <code class="highlighter-rouge">manifest.json</code> file that was generated for NaCl version as a starting point
+and then altered it to work with the non-NaCl version instead. Here is the manifest file
+that I created:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+   </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Munchy Bunny! Demo"</span><span class="p">,</span><span class="w">
+   </span><span class="s2">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.4.5"</span><span class="p">,</span><span class="w">
+   </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Classic platformer fun for Google Chrome. Bounce through 2 demo levels collecting eggs and find the hidden golden eggs!"</span><span class="p">,</span><span class="w">
+   </span><span class="s2">"icons"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"16"</span><span class="p">:</span><span class="w"> </span><span class="s2">"icon16.png"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"48"</span><span class="p">:</span><span class="w"> </span><span class="s2">"icon48.png"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"128"</span><span class="p">:</span><span class="w"> </span><span class="s2">"icon128.png"</span><span class="w">
+   </span><span class="p">},</span><span class="w">
+   </span><span class="s2">"offline_enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+   </span><span class="s2">"app"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"launch"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+         </span><span class="s2">"local_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"WebPlayer.html"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>My version numbers consist of three parts (1.0.4 for example) however you may notice the
+presence of an the additional “.5” number. It took 5 revisions before I was happy to
+submit my extension for the masses. Each submission of an extension must have a newer
+version number, so adding the fourth part allows this without altering the release version
+each time for trivial changes.</p>
+
+<p>With <em>Munchy Bunny!</em> the idea is to keep version numbering consistent across all platforms.
+Currently the iPhone/iPad is running version 1.0.3, for example. The demo version is 1.0.4
+in this case because it contains improvements that have not yet been applied to the mobile
+version.</p>
+
+<p>This is quite an important concept to bare in mind because otherwise you could loose some
+control over your version numbers (like accidentally releasing 2.0.4 instead of 1.0.4).
+There doesn’t appear to be a way to correct this without deleting the extension and
+starting over (which could mean loss of reviews and valuable feedback from end-users).</p>
+
+<p>My game does not require a connection to the Internet once it has been installed. So I
+added the “offline_enabled” property. I needed to adjust the launch path so that it would
+launch the WebPlayer instead of the NaCl version.</p>
+
+<p>Having done this all I needed to do was to zip the following files for submission:</p>
+
+<ul>
+  <li>img (directory) – for custom styling of HTML page</li>
+  <li>icon128.png</li>
+  <li>icon48.png</li>
+  <li>icon16.png</li>
+  <li>manifest.json</li>
+  <li>style.css</li>
+  <li>WebPlayer.html</li>
+  <li>WebPlayer.unity3d</li>
+</ul>
+
+<p>I found the whole process surprisingly straightforward, and the extension became available
+immediately for download. It took just over 24 hours before the extension was available
+via search facility of store, and about 3 days before appearing in Google search results.</p>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

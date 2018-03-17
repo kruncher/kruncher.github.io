@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Package management for Unity projects | Lea Hayes</title>
+<meta property="og:title" content="Package management for Unity projects" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="As many of us have found; when working with even small projects you end up having many variations of reusable source code scattered across the projects. In some situations you will even find yourself having a project that has many versions of the exact same JSON library since each asset bundles it within a unique (or sometimes clashing) namespace." />
+<meta property="og:description" content="As many of us have found; when working with even small projects you end up having many variations of reusable source code scattered across the projects. In some situations you will even find yourself having a project that has many versions of the exact same JSON library since each asset bundles it within a unique (or sometimes clashing) namespace." />
+<link rel="canonical" href="/2017/03/20/package-management-for-unity-projects.html" />
+<meta property="og:url" content="/2017/03/20/package-management-for-unity-projects.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-03-20T00:00:00+00:00" />
+<script type="application/ld+json">
+{"name":null,"description":"As many of us have found; when working with even small projects you end up having many variations of reusable source code scattered across the projects. In some situations you will even find yourself having a project that has many versions of the exact same JSON library since each asset bundles it within a unique (or sometimes clashing) namespace.","author":null,"@type":"BlogPosting","url":"/2017/03/20/package-management-for-unity-projects.html","publisher":null,"image":null,"headline":"Package management for Unity projects","dateModified":"2017-03-20T00:00:00+00:00","datePublished":"2017-03-20T00:00:00+00:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2017/03/20/package-management-for-unity-projects.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Package management for Unity projects</h1>
+    <p class="post__meta">
+      <time datetime="2017-03-20T00:00:00+00:00" itemprop="datePublished">
+        
+        Mar 20, 2017
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>As many of us have found; when working with even small projects you end up having many
+variations of reusable source code scattered across the projects. In some situations you
+will even find yourself having a project that has many versions of the exact same JSON
+library since each asset bundles it within a unique (or sometimes clashing) namespace.</p>
+
+<p>Clearly this is a problem that needs to be addressed! The obvious solution is to utilize
+a package manager so that common dependencies can be shared. A package manager also makes
+it easier to update to newer versions of a package whilst at the same time allowing you
+to use a specific version of a package when needed.</p>
+
+<p>So if you need to make an important change to a package that is common to a number of your
+projects, you can make that change centrally and then simply rebuild each of the projects
+using the latest version of that package. Another nice advantage is that this encourages
+you to manage each reusable unit within their own repositories.</p>
+
+<p><img src="/assets/blog/2017/03/20/projects-and-packages.png" alt="Projects and Packages" /></p>
+
+<p>At the time of writing, Unity doesn’t actually have its own package manager; and to make
+matters worse, none of the existing package managers are ideal. Having evaluated a few
+options I found that <a href="https://www.nuget.org/">NuGet</a> and npm were the most viable however each with their own
+shortcomings.</p>
+
+<p><a href="https://www.nuget.org/">NuGet</a> is quite complex to setup for this use case and revolves around having compiled
+assemblies. One of the things that I wanted to move towards, especially for open source
+projects, was to switch over to source distribution rather than DLL distribution since it
+is far easier to debug problems.</p>
+
+<p>npm on the other hand is rather straightforward to setup and provides all of the features
+necessary to manage packages and their dependencies. In fact npm5 can even install npm
+packages directly from a git repository using <a href="semver.org">semver</a> encoded tags. This is nice because
+it means that we don’t have to clutter the npm registry with packages that don’t really
+fit into the regular node.js ecosystem. However, npm puts all packages into a hard-coded
+“node_modules” directory.</p>
+
+<p>At first I raised a question in the npm issue tracker which asked about a feature whereby
+a custom directory name could be used for installed packages. I did some searching and
+found that <a href="https://github.com/shadowmint/">shadowmint</a> had been using npm for Unity focused packages (see <a href="https://github.com/shadowmint/unity-package-template">unity-package-template</a>)
+where each package effectively installs itself into the Unity project. Whilst this works I
+felt uncomfortable with potentially having quite inconsistent package syncing logic across
+many packages. Not to mention that the packages become exclusive to Unity projects (when
+UE4 has C# support it’s highly plausible that such packages could work with both).</p>
+
+<p>So I did some experimentation and found a couple of different ways to sync npm packages
+into the Unity project. I found that it was fairly straightforward to create a package
+whose soul purpose is to sync such packages <a href="https://www.npmjs.com/package/unity3d-package-syncer">unity3d-package-syncer</a>. This can then be
+run any time packages are installed, updated or uninstalled.</p>
+
+<p>I soon discovered that actually I didn’t want to synchronize the entire contents of the
+package folder into the Unity project since the folder would often contain javascript
+source files that Unity would misinterpret as UnityScript. In addition packages could
+contain various things that are only relevant to the development of the package such as
+makefiles, unit tests, etc. This rendered the issue of npm forcing you to use the
+“node_modules” directory a moot point since you actually don’t want to install directly
+into the Unity project’s “Assets” folder.</p>
+
+<p>I chose to synchronize packages into the “Plugins” directory of the Unity project because
+this avoids the frequent recompilation of package scripts each time user scripts are
+modified since Unity places them into different assemblies. The “Plugins” directory also
+allows packages to declare internals without exposing them to project specific scripts.</p>
+
+<p>This doesn’t prevent you from constructing packages where DLLs are compiled from sources
+that are then synchronized into the Unity projects. It is straightforward to setup such
+a workflow.</p>
+
+<h2 id="interesting-reads">Interesting Reads</h2>
+
+<ul>
+  <li>
+    <p><a href="https://www.reddit.com/r/Unity3D/comments/409ymg/need_a_real_package_manager_for_unity_try_npm/">Need a real package manager for Unity? Try npm</a></p>
+  </li>
+  <li>
+    <p><a href="http://www.what-could-possibly-go-wrong.com/unity-and-nuget/">Unity and NuGet + JSON.net</a></p>
+  </li>
+  <li>
+    <p><a href="https://github.com/modesttree/Projeny">modesttree/Projeny</a></p>
+  </li>
+</ul>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/npm">npm</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

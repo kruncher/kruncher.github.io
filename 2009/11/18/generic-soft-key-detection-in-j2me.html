@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Generic soft key detection in J2ME | Lea Hayes</title>
+<meta property="og:title" content="Generic soft key detection in J2ME" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="As many of you will be aware, the soft key buttons on mobile phones are general purpose whose purpose change with regard to context. Most popular handsets have two of these directly beneath the screen (one to the left, and one to the right)." />
+<meta property="og:description" content="As many of you will be aware, the soft key buttons on mobile phones are general purpose whose purpose change with regard to context. Most popular handsets have two of these directly beneath the screen (one to the left, and one to the right)." />
+<link rel="canonical" href="/2009/11/18/generic-soft-key-detection-in-j2me.html" />
+<meta property="og:url" content="/2009/11/18/generic-soft-key-detection-in-j2me.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2009-11-18T00:00:00+00:00" />
+<script type="application/ld+json">
+{"name":null,"description":"As many of you will be aware, the soft key buttons on mobile phones are general purpose whose purpose change with regard to context. Most popular handsets have two of these directly beneath the screen (one to the left, and one to the right).","author":null,"@type":"BlogPosting","url":"/2009/11/18/generic-soft-key-detection-in-j2me.html","publisher":null,"image":null,"headline":"Generic soft key detection in J2ME","dateModified":"2009-11-18T00:00:00+00:00","datePublished":"2009-11-18T00:00:00+00:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2009/11/18/generic-soft-key-detection-in-j2me.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Generic soft key detection in J2ME</h1>
+    <p class="post__meta">
+      <time datetime="2009-11-18T00:00:00+00:00" itemprop="datePublished">
+        
+        Nov 18, 2009
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>As many of you will be aware, the soft key buttons on mobile phones are general purpose
+whose purpose change with regard to context. Most popular handsets have two of these
+directly beneath the screen (one to the left, and one to the right).</p>
+
+<p>In my project I needed to be able to detect when the left and right soft keys are being
+pressed but unfortunately J2ME does not define a standard key code. Instead it is up to
+the developer to specify different codes for all of the different phones in their target
+audience.</p>
+
+<p>Two solutions came to mind:</p>
+
+<ol>
+  <li>
+    <p>Compile the application for each target handset.</p>
+  </li>
+  <li>
+    <p>Get the user to specify which button is which (even if they do not realize this!).</p>
+  </li>
+</ol>
+
+<p>I decided to go with option #2 so that my application would work for the majority of
+handsets without making the project too difficult to maintain. Instead of directly asking
+the user to configure the keys, I created a welcome screen.</p>
+
+<p>In addition to a pleasant greeting, the welcome screen has the text “Continue” in the
+bottom left corner. The user will instinctively press the soft key button that is nearest
+that text and so the key code is known for the life of the application. I decided to
+filter out all known keys so that the user does not press the “FIRE” button, etc.</p>
+
+<p><img src="/assets/blog/2009/11/18/j2me_welcome_screen.png" alt="Welcome Screen for J2ME" /></p>
+
+<p>Once the key code of the left soft key is known, we can assume that any other non-standard
+button that is pressed is probably the second soft-key.</p>
+
+<blockquote>
+
+  <p><strong>Note</strong> - This means that other unknown buttons will also behave as the 2nd soft key.</p>
+
+</blockquote>
+
+<p>Here is a simplified version of the welcome screen that I created:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WelcomeCanvas</span> <span class="kd">extends</span> <span class="n">Canvas</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="nf">WelcomeCanvas</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">setFullScreenMode</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">paint</span><span class="o">(</span><span class="n">Graphics</span> <span class="n">g</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">g</span><span class="o">.</span><span class="na">setColor</span><span class="o">(</span><span class="mh">0x336699</span><span class="o">);</span>
+        <span class="n">g</span><span class="o">.</span><span class="na">fillRect</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">getWidth</span><span class="o">(),</span> <span class="n">getHeight</span><span class="o">());</span>
+        <span class="n">g</span><span class="o">.</span><span class="na">setColor</span><span class="o">(</span><span class="mh">0xFFFFFF</span><span class="o">);</span>
+        <span class="n">g</span><span class="o">.</span><span class="na">setFont</span><span class="o">(</span><span class="n">Font</span><span class="o">.</span><span class="na">getFont</span><span class="o">(</span><span class="n">Font</span><span class="o">.</span><span class="na">FACE_SYSTEM</span><span class="o">,</span> <span class="n">Font</span><span class="o">.</span><span class="na">STYLE_PLAIN</span><span class="o">,</span> <span class="n">Font</span><span class="o">.</span><span class="na">SIZE_LARGE</span><span class="o">));</span>
+        <span class="n">g</span><span class="o">.</span><span class="na">drawString</span><span class="o">(</span><span class="s">"Welcome!"</span><span class="o">,</span> <span class="n">getWidth</span><span class="o">()</span> <span class="o">/</span> <span class="mi">2</span><span class="o">,</span> <span class="n">getHeight</span><span class="o">()</span> <span class="o">/</span> <span class="mi">2</span><span class="o">,</span> <span class="n">Graphics</span><span class="o">.</span><span class="na">HCENTER</span> <span class="o">|</span> <span class="n">Graphics</span><span class="o">.</span><span class="na">TOP</span><span class="o">);</span>
+
+        <span class="c1">// The all important continue text!</span>
+        <span class="n">g</span><span class="o">.</span><span class="na">setFont</span><span class="o">(</span><span class="n">Font</span><span class="o">.</span><span class="na">getDefaultFont</span><span class="o">());</span>
+        <span class="n">g</span><span class="o">.</span><span class="na">drawString</span><span class="o">(</span><span class="s">"Continue"</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="n">getHeight</span><span class="o">()</span> <span class="o">-</span> <span class="mi">2</span><span class="o">,</span> <span class="n">Graphics</span><span class="o">.</span><span class="na">BOTTOM</span> <span class="o">|</span> <span class="n">Graphics</span><span class="o">.</span><span class="na">LEFT</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">keyPressed</span><span class="o">(</span><span class="kt">int</span> <span class="n">keyCode</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">SoftCommandCanvas</span><span class="o">.</span><span class="na">isKnownKey</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">keyCode</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">SoftCommandCanvas</span><span class="o">.</span><span class="na">KEY_SOFT_LEFT</span> <span class="o">=</span> <span class="n">keyCode</span><span class="o">;</span>
+            <span class="n">continuePressed</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">continuePressed</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Do something!</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Here is an example of how you can then detect which soft key is being pressed in another
+canvas:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SoftCommandCanvas</span> <span class="kd">extends</span> <span class="n">Canvas</span> <span class="o">{</span>
+
+    <span class="c1">// Assigned by `WelcomeCanvas` upon selecting 'Continue'.</span>
+    <span class="c1">// The default value here works for Nokia handsets.</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">KEY_SOFT_LEFT</span> <span class="o">=</span> <span class="o">-</span><span class="mi">6</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">SoftCommandCanvas</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">setFullScreenMode</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isKnownKey</span><span class="o">(</span><span class="n">Canvas</span> <span class="n">canvas</span><span class="o">,</span> <span class="kt">int</span> <span class="n">keyCode</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">keyCode</span> <span class="o">&gt;=</span> <span class="n">KEY_NUM0</span> <span class="o">&amp;&amp;</span> <span class="n">keyCode</span> <span class="o">&lt;=</span> <span class="n">KEY_NUM9</span><span class="o">)</span> <span class="o">||</span>
+            <span class="n">keyCode</span> <span class="o">==</span> <span class="n">KEY_POUND</span> <span class="o">||</span> <span class="n">keyCode</span> <span class="o">==</span> <span class="n">KEY_STAR</span> <span class="o">||</span>
+            <span class="n">canvas</span><span class="o">.</span><span class="na">getGameAction</span><span class="o">(</span><span class="n">keyCode</span><span class="o">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">keyPressed</span><span class="o">(</span><span class="kt">int</span> <span class="n">keyCode</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">isKnownKey</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">keyCode</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">keyCode</span> <span class="o">==</span> <span class="n">KEY_SOFT_LEFT</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">fireLeftSoftCommand</span><span class="o">();</span>
+            <span class="o">}</span>
+            <span class="k">else</span> <span class="o">{</span>
+                <span class="n">fireRightSoftCommand</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">else</span> <span class="o">{</span>
+            <span class="kd">super</span><span class="o">.</span><span class="na">keyPressed</span><span class="o">(</span><span class="n">keyCode</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">fireLeftSoftCommand</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Do something!</span>
+    <span class="o">}</span>
+
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">fireRightSoftCommand</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Do something!</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/j2me">j2me</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/java">java</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

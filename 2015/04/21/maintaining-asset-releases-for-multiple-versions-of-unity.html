@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Maintaining asset releases for multiple versions of Unity | Lea Hayes</title>
+<meta property="og:title" content="Maintaining asset releases for multiple versions of Unity" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="When Unity 4 was released I was able to continue to provide support for Unity 3 by tweaking logic so that it would satisfy both of the releases of Unity and in a couple of circumstances to use reflection to transparently select between Unity 3 and Unity 4 APIs. This mainly affected editor logic and so it was possible to get JIT compiled delegates to make the reflected invocations more efficient." />
+<meta property="og:description" content="When Unity 4 was released I was able to continue to provide support for Unity 3 by tweaking logic so that it would satisfy both of the releases of Unity and in a couple of circumstances to use reflection to transparently select between Unity 3 and Unity 4 APIs. This mainly affected editor logic and so it was possible to get JIT compiled delegates to make the reflected invocations more efficient." />
+<link rel="canonical" href="/2015/04/21/maintaining-asset-releases-for-multiple-versions-of-unity.html" />
+<meta property="og:url" content="/2015/04/21/maintaining-asset-releases-for-multiple-versions-of-unity.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-04-21T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"When Unity 4 was released I was able to continue to provide support for Unity 3 by tweaking logic so that it would satisfy both of the releases of Unity and in a couple of circumstances to use reflection to transparently select between Unity 3 and Unity 4 APIs. This mainly affected editor logic and so it was possible to get JIT compiled delegates to make the reflected invocations more efficient.","author":null,"@type":"BlogPosting","url":"/2015/04/21/maintaining-asset-releases-for-multiple-versions-of-unity.html","publisher":null,"image":null,"headline":"Maintaining asset releases for multiple versions of Unity","dateModified":"2015-04-21T00:00:00+01:00","datePublished":"2015-04-21T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2015/04/21/maintaining-asset-releases-for-multiple-versions-of-unity.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Maintaining asset releases for multiple versions of Unity</h1>
+    <p class="post__meta">
+      <time datetime="2015-04-21T00:00:00+01:00" itemprop="datePublished">
+        
+        Apr 21, 2015
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>When Unity 4 was released I was able to continue to provide support for Unity 3 by
+tweaking logic so that it would satisfy both of the releases of Unity and in a couple of
+circumstances to use reflection to transparently select between Unity 3 and Unity 4 APIs.
+This mainly affected editor logic and so it was possible to get JIT compiled delegates to
+make the reflected invocations more efficient.</p>
+
+<p>With Unity 5 there were quite a number of significant changes which made it very difficult
+for me to provide support for Unity 4 and Unity 5 with a single set of compiled assemblies.
+In addition to this the asset file format was no longer backwards compatible which made it
+difficult to maintain the demonstration assets.</p>
+
+<p>I decided to restructure the Visual Studio solution so that the Unity 4 and Unity 5
+distributions have their own separate assets and compiled assemblies. The assemblies are
+still compiled from a single code base by taking advantage of one of the more recent
+Visual Studio features… shared projects. Here is what the solution looks like:</p>
+
+<p><img src="/assets/blog/2015/04/21/solution.png" alt="Screenshot of solution and projects" /></p>
+
+<p>There is a project representing each of the compiled assemblies which defines the set of
+macros (for example, <code class="highlighter-rouge">UNITY_4</code>, <code class="highlighter-rouge">UNITY_EDITOR</code>, etc) to support conditional compilation.
+The main code base is defined using shared projects which are referenced by each of the
+distribution projects.</p>
+
+<p>Starting with Unity 5 it’s possible to build a separate runtime assembly for use in-editor
+and for final builds. This is consistent with the approach that Unity are using with their
+open source uGUI module.</p>
+
+<p>Finally there are two empty projects whose purpose is to assist with the building process.
+The “PostBuildProject” is entirely empty and has no build events; this is marked as the
+default project and depends on all of the other projects. This is useful since the entire
+solution can be built in the correct order by rebuilding this one project.</p>
+
+<p>All of the projects in the solution depend upon the “PreBuildProject” project allowing
+pre-build events to be undertaken before any of the projects are built. This automates
+various things such as updating assembly version numbers, showing the git commit hash in
+the about window, deploying localization files; updating libraries, etc.</p>
+
+<p>The project build order is resolved by Visual Studio in the following way:</p>
+
+<p><img src="/assets/blog/2015/04/21/build-order.png" alt="Screenshot of solution and projects" /></p>
+
+<p>The solution’s directory structure looks something like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rotorz-tile-system/
+  |-- _private/
+  |-- Deploy/
+  |    |-- Unity 4/
+  |    |    |-- Assets/
+  |    |    |    |-- Rotorz/
+  |    |    |    |    |-- Common/
+  |    |    |    |    |    |-- (various assets)
+  |    |    |    |    |-- Tile System/
+  |    |    |    |    |    |-- (various assets)
+  |    |-- Unity 5/
+  |    |    |-- Assets/
+  |    |    |    |-- Rotorz/
+  |    |    |    |    |-- Common/
+  |    |    |    |    |    |-- (various assets)
+  |    |    |    |    |-- Tile System/
+  |    |    |    |    |    |-- (various assets)
+  |-- Documentation/
+  |    |-- (api reference)
+  |    |-- (user guide)
+  |-- Libraries/
+  |    |-- (internal assemblies and tools to merge into deployed assemblies)
+  |-- Localization/
+  |-- Source/
+  |    |-- Build/
+  |    |    |-- PostBuildProject/
+  |    |    |-- PreBuildProject/
+  |    |-- Distributions/
+  |    |    |-- Unity 4/
+  |    |    |    |-- TileSystem.Editor_Unity4/
+  |    |    |    |-- TileSystem.Runtime_Unity4/
+  |    |    |-- Unity 5/
+  |    |    |    |-- TileSystem.Editor_Unity5/
+  |    |    |    |-- TileSystem.Runtime_Editor_Unity5/
+  |    |    |    |-- TileSystem.Runtime_Standalone_Unity5/
+  |    |-- Main/
+  |    |    |-- Common/
+  |    |    |-- TileSystem.Editor/
+  |    |    |-- TileSystem.Runtime/
+  |    |-- Rotorz Tile System.sln
+  |-- .editorconfig
+  |-- .gitattributes
+  |-- .gitignore
+  |-- build.js
+  |-- package.json   (node.js is used to automate various tasks)
+  |-- README.md
+</code></pre></div></div>
+
+<p>Outputs are then exported as two separate asset packages; one exported using the latest
+release of Unity 4 and the other using the latest release of Unity 5.</p>
+
+<p>For each submission to the Unity asset store I create a blank Unity 4 and Unity 5 project;
+import the freshly baked packages along with the “Asset Store Tools” package for the
+submission process. Whilst this last part could be automated, I find that it is useful to
+go through this process manually each time since it allows me to verify that the asset
+imports without any errors.</p>
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/visual-studio">visual-studio</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

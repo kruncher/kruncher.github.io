@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Separation of concerns with Unity UI | Lea Hayes</title>
+<meta property="og:title" content="Separation of concerns with Unity UI" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I have worked with various interpretations of MVC-like patterns over the years and have experimented a lot with applying them to UIs in Unity. The patterns that I found to work best with nGUI and uGUI are MVP (Model-View-Presenter) (passive view) and MVVM (Model-View-ViewModel)." />
+<meta property="og:description" content="I have worked with various interpretations of MVC-like patterns over the years and have experimented a lot with applying them to UIs in Unity. The patterns that I found to work best with nGUI and uGUI are MVP (Model-View-Presenter) (passive view) and MVVM (Model-View-ViewModel)." />
+<link rel="canonical" href="/2016/09/25/separation-of-concerns-with-unity-ui.html" />
+<meta property="og:url" content="/2016/09/25/separation-of-concerns-with-unity-ui.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-09-25T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"I have worked with various interpretations of MVC-like patterns over the years and have experimented a lot with applying them to UIs in Unity. The patterns that I found to work best with nGUI and uGUI are MVP (Model-View-Presenter) (passive view) and MVVM (Model-View-ViewModel).","author":null,"@type":"BlogPosting","url":"/2016/09/25/separation-of-concerns-with-unity-ui.html","publisher":null,"image":null,"headline":"Separation of concerns with Unity UI","dateModified":"2016-09-25T00:00:00+01:00","datePublished":"2016-09-25T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2016/09/25/separation-of-concerns-with-unity-ui.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Separation of concerns with Unity UI</h1>
+    <p class="post__meta">
+      <time datetime="2016-09-25T00:00:00+01:00" itemprop="datePublished">
+        
+        Sep 25, 2016
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>I have worked with various interpretations of MVC-like patterns over the years and have
+experimented a lot with applying them to UIs in Unity. The patterns that I found to work
+best with nGUI and uGUI are MVP (<strong>M</strong>odel-<strong>V</strong>iew-<strong>P</strong>resenter) (passive view) and MVVM
+(<strong>M</strong>odel-<strong>V</strong>iew-<strong>V</strong>iew<strong>M</strong>odel).</p>
+
+<hr />
+
+<p><strong>Contents</strong></p>
+
+<ul id="markdown-toc">
+  <li><a href="#some-notes" id="markdown-toc-some-notes">Some notes</a></li>
+  <li><a href="#wiring-up-the-view-using-the-inspector" id="markdown-toc-wiring-up-the-view-using-the-inspector">Wiring up the view using the inspector</a></li>
+  <li><a href="#mvp-passive-view" id="markdown-toc-mvp-passive-view">MVP (Passive View)</a></li>
+  <li><a href="#mvvm" id="markdown-toc-mvvm">MVVM</a></li>
+  <li><a href="#conclusion" id="markdown-toc-conclusion">Conclusion</a></li>
+</ul>
+
+<h2 id="some-notes">Some notes</h2>
+
+<p>There are some pretty significant tradeoffs between the MVP and MVVM patterns:</p>
+
+<ul>
+  <li>
+    <p>MVP - Can be implemented without using a special framework; but you will likely end up
+having to implement many more interfaces.</p>
+  </li>
+  <li>
+    <p>MVP - Values can be passed around efficiently using properties.</p>
+  </li>
+  <li>
+    <p>MVP - Properties can be renamed easily using refactoring tools.</p>
+  </li>
+  <li>
+    <p>MVVM - Exceptionally nice to work with once you have a good framework in place</p>
+  </li>
+  <li>
+    <p>MVVM - Data binding tends to be implemented using reflection, property wrappers and
+expression trees. Reflection isn’t ideal for real-time since it can lead to GC spikes.
+Normally expression trees could be used to optimize this except many of Unity’s target
+platforms do not allow JIT. This leaves property wrappers but these are far from ideal
+since suddenly view models are nolonger POCOs.</p>
+  </li>
+  <li>
+    <p>MVVM - Works very well with the <a href="https://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged(v=vs.110).aspx">INotifyPropertyChanged</a> interface. Modern C# language
+features can automatically capture property names making them refactor friendly; for
+instance with the <code class="highlighter-rouge">nameof</code> syntax… unfortunately at the moment Unity has no support
+for this syntax so refactoring is a bit trickier.</p>
+  </li>
+</ul>
+
+<h2 id="wiring-up-the-view-using-the-inspector">Wiring up the view using the inspector</h2>
+
+<p>In both cases the view component is added to the root-most game object of the view.
+Controls are wired up tot he view component using the inspector:</p>
+
+<p><img src="/assets/blog/2016/09/25/view-panel.png" alt="Screenshot of view panel in editor" /></p>
+
+<h2 id="mvp-passive-view">MVP (Passive View)</h2>
+
+<p><img src="/assets/blog/2016/09/25/mvp.png" alt="MVP overview diagram" /></p>
+
+<p>I find that it helps to have a general interface to activate and deactivate presenters so
+that interfaces can be entirely disabled whilst they are not the center of attention. In
+Unity it is a common workflow for smaller games to have a single “MenuSystem” prefab that
+holds all of the game’s UI panels so that they don’t have to be continuously instantiated
+and destroyed.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">interface</span> <span class="nc">IPresenter</span>
+<span class="p">{</span>
+    <span class="k">void</span> <span class="nf">Activate</span><span class="p">();</span>
+    <span class="k">void</span> <span class="nf">Deactivate</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The view is injected into the presenter upon construction and in this situation I am using
+an event aggregator to communicate navigation events to the navigation controller.</p>
+
+<p>Upon being activated the associated view is shown using the view-specific <code class="highlighter-rouge">Show</code> method
+which could potentially accept additional arguments. The view’s properties are also
+initialized from the applications current state.</p>
+
+<p>The presenter updates the enabled state of the “Next” button whenever the view reports
+changes to the “Nickname” input. For this example I chose to simply expose a dedicated
+event although another option might be to have the view implement <a href="https://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged(v=vs.110).aspx">INotifyPropertyChanged</a>
+which would allow the presenter to update the enabled state of the “Next” button based
+upon any input being changed.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">InputPlayerDetailsPresenter</span> <span class="p">:</span> <span class="n">IPresenter</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IInputPlayerDetailsView</span> <span class="n">view</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IEventAggregator</span> <span class="n">events</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="nf">InputPlayerDetailsPresenter</span><span class="p">(</span>
+        <span class="n">IInputPlayerDetailsView</span> <span class="n">view</span><span class="p">,</span>
+        <span class="n">IEventAggregator</span> <span class="n">events</span>
+    <span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span> <span class="p">=</span> <span class="n">view</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">events</span> <span class="p">=</span> <span class="n">events</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">CanProceed</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="p">!</span><span class="kt">string</span><span class="p">.</span><span class="nf">IsNullOrEmpty</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">Nickname</span><span class="p">);</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Activate</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="nf">Show</span><span class="p">();</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">PlayerNumber</span> <span class="p">=</span> <span class="m">1</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">NicknameChanged</span> <span class="p">+=</span> <span class="k">this</span><span class="p">.</span><span class="n">View_NicknameChanged</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">BackAction</span> <span class="p">+=</span> <span class="k">this</span><span class="p">.</span><span class="n">View_BackAction</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">NextAction</span> <span class="p">+=</span> <span class="k">this</span><span class="p">.</span><span class="n">View_NextAction</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Deactivate</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="nf">Hide</span><span class="p">();</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">NicknameChanged</span> <span class="p">-=</span> <span class="k">this</span><span class="p">.</span><span class="n">View_NicknameChanged</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">BackAction</span> <span class="p">-=</span> <span class="k">this</span><span class="p">.</span><span class="n">View_BackAction</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">NextAction</span> <span class="p">-=</span> <span class="k">this</span><span class="p">.</span><span class="n">View_NextAction</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">View_NicknameChanged</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">EnableNextAction</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">CanProceed</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">View_BackAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">events</span><span class="p">.</span><span class="nf">Publish</span><span class="p">(</span><span class="k">new</span> <span class="nf">ReturnToPreviousStageMessage</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">View_NextAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(!</span><span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">EnableNextAction</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">events</span><span class="p">.</span><span class="nf">Publish</span><span class="p">(</span><span class="k">new</span> <span class="nf">AdvanceToNextStageMessage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">Nickname</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Each view has an interface and a component that implements that interface. The presenter
+can only communicate with the view component via that interface.</p>
+
+<p>The “Back” and “Next” interactions were given the “Action” suffix rather than “Clicked”
+since these could theoretically be actuated by some other input such as tapping the
+escape key on the keyboard.</p>
+
+<p>Non-editable properties only need to have a setter since they will only ever be set by
+the presenter; the presenter has no interest in reading any modifications that the view
+may have made.</p>
+
+<p>Editable properties require a setter and a getter since the presenter will want to capture
+user inputs from the view. A setter is of course not necessary if the presenter should
+never initialize the value of that input.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">interface</span> <span class="nc">IInputPlayerDetailsView</span>
+<span class="p">{</span>
+    <span class="k">event</span> <span class="n">Action</span> <span class="n">NicknameChanged</span><span class="p">;</span>
+    <span class="k">event</span> <span class="n">Action</span> <span class="n">BackAction</span><span class="p">;</span>
+    <span class="k">event</span> <span class="n">Action</span> <span class="n">NextAction</span><span class="p">;</span>
+
+
+    <span class="c1">// A non-editable properties.</span>
+    <span class="kt">int</span> <span class="n">PlayerNumber</span> <span class="p">{</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">bool</span> <span class="n">EnableNextAction</span> <span class="p">{</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="c1">// An editable property.</span>
+    <span class="kt">string</span> <span class="n">Nickname</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+
+    <span class="k">void</span> <span class="nf">Show</span><span class="p">();</span>
+    <span class="k">void</span> <span class="nf">Hide</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The view component should be attached to the root-most game object that represents the
+entire “Input Player Details” panel. Each control of interest can be associated with the
+view component using the inspector.</p>
+
+<p>In this case the view has a hard-coded string to format the player number label; this can
+easily be localized by injecting a localization service into the view.</p>
+
+<p>The view subscribes to various Unity UI control events and relays them to the presenter
+via the events that were declared in the <code class="highlighter-rouge">IInputPlayerDetailsView</code> interface. The
+presenter can then decide how to handle the user interaction. For instance, the presenter
+can update the enabled state of the “Next” button each time changes are made to the
+nickname input.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">InputPlayerDetailsView</span> <span class="p">:</span> <span class="n">MonoBehaviour</span><span class="p">,</span> <span class="n">IInputPlayerDetailsView</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">Text</span> <span class="n">playerNumberText</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">InputField</span> <span class="n">nicknameInputField</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">Button</span> <span class="n">backButton</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">Button</span> <span class="n">nextButton</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="k">event</span> <span class="n">Action</span> <span class="n">NicknameChanged</span><span class="p">;</span>
+    <span class="k">public</span> <span class="k">event</span> <span class="n">Action</span> <span class="n">BackAction</span><span class="p">;</span>
+    <span class="k">public</span> <span class="k">event</span> <span class="n">Action</span> <span class="n">NextAction</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">PlayerNumber</span> <span class="p">{</span>
+        <span class="k">set</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">playerNumberText</span><span class="p">.</span><span class="n">text</span> <span class="p">=</span> <span class="kt">string</span><span class="p">.</span><span class="nf">Format</span><span class="p">(</span><span class="s">"Player {0}"</span><span class="p">,</span> <span class="k">value</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Nickname</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">nicknameInputField</span><span class="p">.</span><span class="n">text</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">nicknameInputField</span><span class="p">.</span><span class="n">text</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">bool</span> <span class="n">EnableNextAction</span> <span class="p">{</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">nextButton</span><span class="p">.</span><span class="n">IsInteractable</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnEnable</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">nicknameInputField</span><span class="p">.</span><span class="n">onValueChange</span><span class="p">.</span><span class="nf">AddListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">OnNicknameChanged</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">backButton</span><span class="p">.</span><span class="n">onClick</span><span class="p">.</span><span class="nf">AddListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">OnBackAction</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">nextButton</span><span class="p">.</span><span class="n">onClick</span><span class="p">.</span><span class="nf">AddListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">OnNextAction</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnDisable</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">nicknameInputField</span><span class="p">.</span><span class="n">onValueChange</span><span class="p">.</span><span class="nf">RemoveListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">OnNicknameChanged</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">backButton</span><span class="p">.</span><span class="n">onClick</span><span class="p">.</span><span class="nf">RemoveListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">OnBackAction</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">nextButton</span><span class="p">.</span><span class="n">onClick</span><span class="p">.</span><span class="nf">RemoveListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">OnNextAction</span><span class="p">);</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnNicknameChanged</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">NicknameChanged</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">handler</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">handler</span><span class="p">.</span><span class="nf">Invoke</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnBackAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">BackAction</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">handler</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">handler</span><span class="p">.</span><span class="nf">Invoke</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnNextAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">NextAction</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">handler</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">handler</span><span class="p">.</span><span class="nf">Invoke</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Show</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">gameObject</span><span class="p">.</span><span class="nf">SetActive</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Hide</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">gameObject</span><span class="p">.</span><span class="nf">SetActive</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="mvvm">MVVM</h2>
+
+<p><img src="/assets/blog/2016/09/25/mvvm.png" alt="MVVM overview diagram" /></p>
+
+<p>I created a proof-of-concept implementation of a general purpose data binding solution
+since .NET / Mono does not include a general purpose solution. My implementation supports
+the standard binding modes (UpdateOnce, OneWay and TwoWay).</p>
+
+<p>I also opened a <a href="https://github.com/dotnet/corefx/issues/3107">feature request</a> on the .NET Core project’s git repository since I
+believe that this would be a fantastic addition to the framework.</p>
+
+<p>Using my proof-of-concept framework a view model can be implemented like follows:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">InputPlayerDetailsViewModel</span> <span class="p">:</span> <span class="n">ViewModelBase</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IEventAggregator</span> <span class="n">events</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">playerNumber</span> <span class="p">=</span> <span class="s">"Player 1"</span><span class="p">;</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">nickname</span> <span class="p">=</span> <span class="s">""</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">DelegateCommand</span> <span class="n">backCommand</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">DelegateCommand</span> <span class="n">nextCommand</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="nf">GameRulesScreenViewModel</span><span class="p">(</span><span class="n">IEventAggregator</span> <span class="n">events</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">events</span> <span class="p">=</span> <span class="n">events</span><span class="p">;</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="n">backCommand</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DelegateCommand</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">OnBackCommand</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">nextCommand</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DelegateCommand</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">OnNextCommand</span><span class="p">,</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="n">CanProceed</span><span class="p">);</span>
+    <span class="p">}</span>
+
+
+    <span class="c1">// Input fields can be bound to this property.</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">PlayerNumber</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">playerNumber</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nf">SetPropertyField</span><span class="p">(</span><span class="k">ref</span> <span class="k">this</span><span class="p">.</span><span class="n">playerNumber</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="s">"PlayerNumber"</span><span class="p">);</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Nickname</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">nickname</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nf">SetPropertyField</span><span class="p">(</span><span class="k">ref</span> <span class="k">this</span><span class="p">.</span><span class="n">nickname</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="s">"Nickname"</span><span class="p">);</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="c1">// Button controls can be bound to these properties.</span>
+    <span class="k">public</span> <span class="n">ICommand</span> <span class="n">BackCommand</span> <span class="p">{</span>
+      <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">backCommand</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">ICommand</span> <span class="n">NextCommand</span> <span class="p">{</span>
+      <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">nextCommand</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">CanProceed</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="p">!</span><span class="kt">string</span><span class="p">.</span><span class="nf">IsNullOrEmpty</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">Nickname</span><span class="p">);</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnBackCommand</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">events</span><span class="p">.</span><span class="nf">Publish</span><span class="p">(</span><span class="k">new</span> <span class="nf">ReturnToPreviousStageMessage</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnNextCommand</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">events</span><span class="p">.</span><span class="nf">Publish</span><span class="p">(</span><span class="k">new</span> <span class="nf">AdvanceToNextStageMessage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">Nickname</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Each view is represented by a view component on the root game object of a uGUI or nGUI
+panel. All bindable controls are associated with the view component using the inspector
+window. As you can see in the following example, I created adapters for some of Unity’s
+UI controls to make some of their important properties bindable by implementing
+<a href="https://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged(v=vs.110).aspx">INotifyPropertyChanged</a>.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">InputPlayerDetailsView</span> <span class="p">:</span> <span class="n">MonoView</span><span class="p">&lt;</span><span class="n">InputPlayerDetailsViewModel</span><span class="p">&gt;</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">BindableText</span> <span class="n">playerNumberText</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">BindableInputField</span> <span class="n">nicknameInputField</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">BindableButton</span> <span class="n">backButton</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">BindableButton</span> <span class="n">nextButton</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+
+    <span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnBind</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">Bindings</span><span class="p">.</span><span class="nf">AddProperty</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">ViewModel</span><span class="p">,</span> <span class="s">"PlayerNumber"</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">playerNumberText</span><span class="p">,</span> <span class="s">"Text"</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">Bindings</span><span class="p">.</span><span class="nf">AddProperty</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">ViewModel</span><span class="p">,</span> <span class="s">"Nickname"</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">nicknameInputField</span><span class="p">,</span> <span class="s">"Text"</span><span class="p">);</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="n">Bindings</span><span class="p">.</span><span class="nf">AddCommand</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">backButton</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">ViewModel</span><span class="p">.</span><span class="n">BackCommand</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">Bindings</span><span class="p">.</span><span class="nf">AddCommand</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">nextButton</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">ViewModel</span><span class="p">.</span><span class="n">NextCommand</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<blockquote>
+
+  <p><strong>Note</strong> - The <code class="highlighter-rouge">InputPlayerDetailsViewModel</code> instance is injected into the above view.
+In this particular experiment my navigation controller has ownership of the view model.</p>
+
+</blockquote>
+
+<p>My proof-of-concept binding mechanism doesn’t provide a way to format or convert the
+values of bound properties; hence why the player number is already encoded as a string.
+This is a feature that could be added if I decide to use the MVVM design pattern in a
+project.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Having spent a couple of days on each of these approaches using uGUI and nGUI I found that
+the MVP pattern provided the least amount of friction. This was primarily due to the fact
+that MVP is barebones in that it doesn’t require a special framework.</p>
+
+<p>With MVP (passive view) the binding logic is implemented manually which means that it is
+fairly straightforward to support the binding of all sorts of exotic properties with UI
+controls. Also there aren’t too many moving parts; it is quite easy to follow the flow of
+execution throughout the binding layer.</p>
+
+<p>With MVVM I found myself having to write new adapters and utilities frequently to assist
+with data binding and I realize that this would likely be an ongoing process since
+projects are always going to require specialized binding logic. The framework would grow
+and become more capable as more projects are developed.</p>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/design-pattern">design-pattern</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/zenject">zenject</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

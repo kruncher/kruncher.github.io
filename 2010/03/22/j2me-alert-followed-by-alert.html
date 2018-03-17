@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>J2ME: Alert followed by Alert | Lea Hayes</title>
+<meta property="og:title" content="J2ME: Alert followed by Alert" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I have been working on a J2ME application. There is an instance where a message box appears so as to confirm an action with the user, if the user confirms the action then a subsequent alert may be shown. Whilst in theory this should have been straightforward the application just kept throwing an IllegalArgumentException." />
+<meta property="og:description" content="I have been working on a J2ME application. There is an instance where a message box appears so as to confirm an action with the user, if the user confirms the action then a subsequent alert may be shown. Whilst in theory this should have been straightforward the application just kept throwing an IllegalArgumentException." />
+<link rel="canonical" href="/2010/03/22/j2me-alert-followed-by-alert.html" />
+<meta property="og:url" content="/2010/03/22/j2me-alert-followed-by-alert.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2010-03-22T00:00:00+00:00" />
+<script type="application/ld+json">
+{"name":null,"description":"I have been working on a J2ME application. There is an instance where a message box appears so as to confirm an action with the user, if the user confirms the action then a subsequent alert may be shown. Whilst in theory this should have been straightforward the application just kept throwing an IllegalArgumentException.","author":null,"@type":"BlogPosting","url":"/2010/03/22/j2me-alert-followed-by-alert.html","publisher":null,"image":null,"headline":"J2ME: Alert followed by Alert","dateModified":"2010-03-22T00:00:00+00:00","datePublished":"2010-03-22T00:00:00+00:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2010/03/22/j2me-alert-followed-by-alert.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">J2ME: Alert followed by Alert</h1>
+    <p class="post__meta">
+      <time datetime="2010-03-22T00:00:00+00:00" itemprop="datePublished">
+        
+        Mar 22, 2010
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>I have been working on a J2ME application. There is an instance where a message box
+appears so as to confirm an action with the user, if the user confirms the action then a
+subsequent alert may be shown. Whilst in theory this should have been straightforward the
+application just kept throwing an <code class="highlighter-rouge">IllegalArgumentException</code>.</p>
+
+<p>In the <a href="http://www.oracle.com/technetwork/java/index.html#setCurrent(javax.microedition.lcdui.Alert, javax.microedition.lcdui.Displayable)">API documentation</a> for J2ME I found that the
+<code class="highlighter-rouge">Display.setCurrent(alert, nextDisplayable)</code> function will throw such an exception when
+<code class="highlighter-rouge">nextDisplayable</code> is an <code class="highlighter-rouge">Alert</code> instance. However, I was not using this function. The
+alert was being displayed using <code class="highlighter-rouge">Display.setCurrent(displayable)</code>, and upon selecting
+“Confirm” was simply displaying another alert again with <code class="highlighter-rouge">Display.setCurrent(displayable)</code>.</p>
+
+<p>James Mernin’s blog post <a href="http://www.mernin.com/blog/?p=26&amp;cpage=1">Alert after Alert in J2ME</a> shows that this is in fact a result
+of the same limitation within J2ME. For my purposes I found that the simplest solution was
+to create a blank canvas, and upon the first paint event switch to the intended alert.
+This essentially breaks the chain into <code class="highlighter-rouge">Alert</code> &gt; <code class="highlighter-rouge">Canvas</code> &gt; <code class="highlighter-rouge">Alert</code>.</p>
+
+<p>In light of this I amended my <code class="highlighter-rouge">DisplayManager</code> so that it deals with this issue
+transparently. My <code class="highlighter-rouge">DisplayManager.setCurrent(displayable)</code> method was replaced with the
+following:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">setCurrent</span><span class="o">(</span><span class="n">Displayable</span> <span class="n">d</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// Switch to new displayable.</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="n">d</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">current</span> <span class="k">instanceof</span> <span class="n">javax</span><span class="o">.</span><span class="na">microedition</span><span class="o">.</span><span class="na">lcdui</span><span class="o">.</span><span class="na">Alert</span> <span class="o">&amp;&amp;</span>
+            <span class="n">display</span><span class="o">.</span><span class="na">getCurrent</span><span class="o">()</span> <span class="k">instanceof</span> <span class="n">javax</span><span class="o">.</span><span class="na">microedition</span><span class="o">.</span><span class="na">lcdui</span><span class="o">.</span><span class="na">Alert</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Switch to a black canvas temporarily!</span>
+        <span class="n">display</span><span class="o">.</span><span class="na">setCurrent</span><span class="o">(</span><span class="k">new</span> <span class="n">BlackCanvas</span><span class="o">());</span>
+    <span class="o">}</span>
+    <span class="k">else</span> <span class="o">{</span>
+        <span class="n">display</span><span class="o">.</span><span class="na">setCurrent</span><span class="o">(</span><span class="n">current</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>If an alert is about to be displayed, the above code will show a blank canvas if an alert
+is already shown. The blank canvas will then show the alert as soon as it is first painted.
+I implemented this blank canvas as shown below:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">DisplayManager</span> <span class="o">{</span>
+    <span class="o">...</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">BlackCanvas</span> <span class="kd">extends</span> <span class="n">Canvas</span> <span class="o">{</span>
+        <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">paint</span><span class="o">(</span><span class="n">Graphics</span> <span class="n">g</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// Paint canvas to black to reduce flicker.</span>
+            <span class="c1">// Note: You may decide to change this to suite your needs.</span>
+            <span class="n">g</span><span class="o">.</span><span class="na">setColor</span><span class="o">(</span><span class="mh">0x000000</span><span class="o">);</span>
+            <span class="n">g</span><span class="o">.</span><span class="na">fillRect</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">getWidth</span><span class="o">(),</span> <span class="n">getHeight</span><span class="o">());</span>
+
+            <span class="c1">// Now show the alert that we really wanted!</span>
+            <span class="n">DisplayManager</span><span class="o">.</span><span class="na">setCurrent</span><span class="o">(</span><span class="n">DisplayManager</span><span class="o">.</span><span class="na">getCurrent</span><span class="o">());</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/j2me">j2me</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/java">java</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

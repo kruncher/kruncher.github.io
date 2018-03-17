@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>PrototypeJS extension: namespaces for JavaScript | Lea Hayes</title>
+<meta property="og:title" content="PrototypeJS extension: namespaces for JavaScript" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Namespaces are an extremely useful tool when working with numerous classes, functions or even objects in many programming languages. They allow the developer to group these entities in an intuitive way to facilitate readability." />
+<meta property="og:description" content="Namespaces are an extremely useful tool when working with numerous classes, functions or even objects in many programming languages. They allow the developer to group these entities in an intuitive way to facilitate readability." />
+<link rel="canonical" href="/2010/01/19/prototypejs-extension-namespaces-for-javascript.html" />
+<meta property="og:url" content="/2010/01/19/prototypejs-extension-namespaces-for-javascript.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2010-01-19T00:00:00+00:00" />
+<script type="application/ld+json">
+{"name":null,"description":"Namespaces are an extremely useful tool when working with numerous classes, functions or even objects in many programming languages. They allow the developer to group these entities in an intuitive way to facilitate readability.","author":null,"@type":"BlogPosting","url":"/2010/01/19/prototypejs-extension-namespaces-for-javascript.html","publisher":null,"image":null,"headline":"PrototypeJS extension: namespaces for JavaScript","dateModified":"2010-01-19T00:00:00+00:00","datePublished":"2010-01-19T00:00:00+00:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2010/01/19/prototypejs-extension-namespaces-for-javascript.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">PrototypeJS extension: namespaces for JavaScript</h1>
+    <p class="post__meta">
+      <time datetime="2010-01-19T00:00:00+00:00" itemprop="datePublished">
+        
+        Jan 19, 2010
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>Namespaces are an extremely useful tool when working with numerous classes, functions or
+even objects in many programming languages. They allow the developer to group these
+entities in an intuitive way to facilitate readability.</p>
+
+<p>More importantly, namespaces are a mechanism which help to avoid clashing occurrences of
+unrelated objects which share the same name. This can easily happen when utilizing sources
+that were developed by separate parties.</p>
+
+<p>A while back I wrote a utility method to ease the support of namespaces within JavaScript.
+This utility method uses features from the <a href="http://prototypejs.org/">PrototypeJS</a> framework.</p>
+
+<p>In JavaScript a function could be placed within a namespace called “First” using the
+following:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// If namespace has not yet been defined, define it.</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">First</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">First</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="p">}</span>
+ 
+<span class="c1">// Add function "foo" to the namespace "First".</span>
+<span class="nx">First</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="s2">"Hello World #1"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Whilst this is fairly straightforward, it is necessary to test and define the required
+namespace every time scripts need to add functionality. Things get even more complicated
+when namespaces are nested within one another:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Make sure that "First.Second.Third" namespace is defined.</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">First</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">First</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">First</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">First</span><span class="p">.</span><span class="nx">Second</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">First</span><span class="p">.</span><span class="nx">Second</span><span class="p">.</span><span class="nx">Third</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">First</span><span class="p">.</span><span class="nx">Second</span><span class="p">.</span><span class="nx">Third</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="p">}</span>
+ 
+<span class="c1">// Add function "foo" to "First.Second.Third" namespace.</span>
+<span class="nx">First</span><span class="p">.</span><span class="nx">Second</span><span class="p">.</span><span class="nx">Third</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="s2">"Hello World #2"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>JavaScript does not include any keywords that are specifically aimed towards tackling this
+problem. I am a massive fan of the <a href="http://prototypejs.org/">PrototypeJS</a> framework because it brings in a lot of
+additional object oriented concepts such as classes and inheritance.</p>
+
+<p>So, I wrote a simple function to be used in conjunction with the PrototypeJS framework
+(note that this function will not work independently). This utility function merely
+simplifies the above two examples to the following:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$namespace</span><span class="p">(</span><span class="s2">"First"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">foo</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"Hello World #1"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+ 
+<span class="nx">$namespace</span><span class="p">(</span><span class="s2">"First.Second.Third"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">foo</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"Hello World #2"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>These functions can then be invoked as follows:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">First</span><span class="p">.</span><span class="nx">foo</span><span class="p">();</span>
+<span class="nx">First</span><span class="p">.</span><span class="nx">Second</span><span class="p">.</span><span class="nx">Third</span><span class="p">.</span><span class="nx">foo</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>Separate scripts can then further extend a namespace using exactly the same approach:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$namespace</span><span class="p">(</span><span class="s2">"First.Second.Third"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">bar</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"Hello World #3"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+ 
+<span class="nx">First</span><span class="p">.</span><span class="nx">foo</span><span class="p">();</span>
+<span class="nx">First</span><span class="p">.</span><span class="nx">Second</span><span class="p">.</span><span class="nx">Third</span><span class="p">.</span><span class="nx">foo</span><span class="p">();</span>
+<span class="nx">First</span><span class="p">.</span><span class="nx">Second</span><span class="p">.</span><span class="nx">Third</span><span class="p">.</span><span class="nx">bar</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>Here is my implementation of this functionality, please feel free to use it in your own
+projects under the usual BSD license. You can acquire the latest version of the
+PrototypeJS framework from <a href="http://prototypejs.org/download">http://prototypejs.org/download</a>.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/*!
+ * (c) 2010-2011 Rotorz Limited. All rights reserved.
+ * License: BSD
+ * Author:  Lea Hayes
+ * Website: http://leahayes.co.uk
+*/</span>
+<span class="kd">var</span> <span class="nx">$global</span> <span class="o">=</span> <span class="nb">window</span><span class="p">;</span>
+ 
+<span class="kd">function</span> <span class="nx">$namespace</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">extension</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">namespaces</span> <span class="o">=</span> <span class="nx">name</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">'.'</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">parentNS</span> <span class="o">=</span> <span class="nx">$global</span><span class="p">;</span>
+  <span class="nx">namespaces</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">nsID</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">ns</span> <span class="o">=</span> <span class="nx">parentNS</span><span class="p">[</span><span class="nx">nsID</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">ns</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">ns</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">parentNS</span><span class="p">[</span><span class="nx">nsID</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ns</span> <span class="o">=</span> <span class="p">{});</span>
+    <span class="p">}</span>
+    <span class="nx">parentNS</span> <span class="o">=</span> <span class="nx">ns</span><span class="p">;</span>
+  <span class="p">});</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">extension</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// Extend namespace?</span>
+    <span class="nb">Object</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">parentNS</span><span class="p">,</span> <span class="nx">extension</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">parentNS</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/javascript">javascript</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/prototypejs">prototypejs</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

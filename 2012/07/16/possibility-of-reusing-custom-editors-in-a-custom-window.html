@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Possibility of reusing custom editors in a custom window? | Lea Hayes</title>
+<meta property="og:title" content="Possibility of reusing custom editors in a custom window?" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Several weeks ago I had some ideas that would add lots of flexibility to my custom editor window. In a nutshell the idea was to add, modify and remove certain components. To be honest I thought that this would be relatively easy because this functionality is already available within Unity inspector windows. I remembered seeing EditorGUILayout.PropertyField and I foolishly assumed that would do the trick, but I was wrong…" />
+<meta property="og:description" content="Several weeks ago I had some ideas that would add lots of flexibility to my custom editor window. In a nutshell the idea was to add, modify and remove certain components. To be honest I thought that this would be relatively easy because this functionality is already available within Unity inspector windows. I remembered seeing EditorGUILayout.PropertyField and I foolishly assumed that would do the trick, but I was wrong…" />
+<link rel="canonical" href="/2012/07/16/possibility-of-reusing-custom-editors-in-a-custom-window.html" />
+<meta property="og:url" content="/2012/07/16/possibility-of-reusing-custom-editors-in-a-custom-window.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2012-07-16T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"Several weeks ago I had some ideas that would add lots of flexibility to my custom editor window. In a nutshell the idea was to add, modify and remove certain components. To be honest I thought that this would be relatively easy because this functionality is already available within Unity inspector windows. I remembered seeing EditorGUILayout.PropertyField and I foolishly assumed that would do the trick, but I was wrong…","author":null,"@type":"BlogPosting","url":"/2012/07/16/possibility-of-reusing-custom-editors-in-a-custom-window.html","publisher":null,"image":null,"headline":"Possibility of reusing custom editors in a custom window?","dateModified":"2012-07-16T00:00:00+01:00","datePublished":"2012-07-16T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2012/07/16/possibility-of-reusing-custom-editors-in-a-custom-window.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Possibility of reusing custom editors in a custom window?</h1>
+    <p class="post__meta">
+      <time datetime="2012-07-16T00:00:00+01:00" itemprop="datePublished">
+        
+        Jul 16, 2012
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>Several weeks ago I had some ideas that would add lots of flexibility to my custom editor
+window. In a nutshell the idea was to add, modify and remove certain components. To be
+honest I thought that this would be relatively easy because this functionality is already
+available within Unity inspector windows. I remembered seeing <code class="highlighter-rouge">EditorGUILayout.PropertyField</code>
+and I foolishly assumed that would do the trick, but I was wrong…</p>
+
+<p>My next attempt was to enumerate component properties using <code class="highlighter-rouge">SerializedObject</code> and
+<code class="highlighter-rouge">SerializedProperty</code>. Whilst this approach did in fact provide something that resembled a
+custom inspector, it was extremely lacking. When I realized, this couldn’t possibly
+utilize custom editors!</p>
+
+<p>For example, the <code class="highlighter-rouge">Transform</code> component has a custom inspector which is tailored
+specifically for it. In Rotorz Tile System we use a custom inspector on <code class="highlighter-rouge">RotorzTileSystem</code>
+components which allows properties to be modified and actions to be performed. These
+custom inspectors are easily defined using the <code class="highlighter-rouge">CustomEditor</code> attribute. So the idea here
+is to reuse these custom editors (which are not necessarily created by myself) within my
+editor window!</p>
+
+<p>With thanks to MonoDevelop’s fantastic assembly browser I came across the undocumented
+class <code class="highlighter-rouge">UnityEditor.ActiveEditorTracker</code>. The publicly exposed methods are well named and
+fairly self-explanatory. So I had a go at creating a rough mockup of a custom inspector. I
+was pleasantly surprised at how easy this had now become. Creating a rudimentary custom
+inspector is as simple as shown below:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">UnityEngine</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">UnityEditor</span><span class="p">;</span>
+ 
+<span class="k">public</span> <span class="k">class</span> <span class="nc">CustomWindow</span> <span class="p">:</span> <span class="n">EditorWindow</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="nf">MenuItem</span><span class="p">(</span><span class="s">"Window/Test"</span><span class="p">)]</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Test</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">EditorWindow</span><span class="p">.</span><span class="n">GetWindow</span><span class="p">&lt;</span><span class="n">CustomWindow</span><span class="p">&gt;(</span><span class="s">"Test"</span><span class="p">);</span>
+    <span class="p">}</span>
+ 
+    <span class="k">private</span> <span class="n">GameObject</span> <span class="n">activeGO</span><span class="p">;</span>
+    <span class="k">private</span> <span class="n">Editor</span> <span class="k">this</span><span class="p">.</span><span class="n">editor</span><span class="p">;</span>
+ 
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">Update</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">activeGO</span> <span class="p">==</span> <span class="n">Selection</span><span class="p">.</span><span class="n">activeGameObject</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+ 
+        <span class="k">this</span><span class="p">.</span><span class="n">activeGO</span> <span class="p">=</span> <span class="n">Selection</span><span class="p">.</span><span class="n">activeGameObject</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">editor</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+ 
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">activeGO</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">editor</span> <span class="p">=</span> <span class="n">ActiveEditorTracker</span><span class="p">.</span><span class="nf">MakeCustomEditor</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">activeGO</span><span class="p">.</span><span class="n">transform</span><span class="p">);</span>
+        <span class="p">}</span>
+ 
+        <span class="nf">Repaint</span><span class="p">();</span>
+    <span class="p">}</span>
+ 
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnGUI</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">go</span> <span class="p">=</span> <span class="n">Selection</span><span class="p">.</span><span class="n">activeGameObject</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">go</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+ 
+        <span class="c1">// Use the registered editor for `Transform`</span>
+        <span class="n">EditorGUILayout</span><span class="p">.</span><span class="nf">InspectorTitlebar</span><span class="p">(</span><span class="k">true</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">editor</span><span class="p">.</span><span class="n">target</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">editor</span><span class="p">.</span><span class="nf">OnInspectorGUI</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Unfortunately this functionality is not currently documented and as such cannot be
+reliably used in a commercial Unity extension because there is no guarantee that it will
+continue to work in future versions of Unity. This is a great shame because I could put
+this to good use! I also suspect that the developers of PlayMaker could utilize this
+functionality if it were documented for customizable action GUIs.</p>
+
+<p>Please consider voting for Unity Technologies to add a basic level of documentation for
+this functionality :)</p>
+
+<p><a href="https://feedback.unity3d.com/suggestions/document-unityeditoractiveedi">https://feedback.unity3d.com/suggestions/document-unityeditoractiveedi</a></p>
+
+<blockquote>
+
+  <p><strong>EDIT - This functionality has since been added in Unity 4!</strong>
+<a href="http://docs.unity3d.com/Documentation/ScriptReference/Editor.CreateEditor.html">http://docs.unity3d.com/Documentation/ScriptReference/Editor.CreateEditor.html</a></p>
+
+</blockquote>
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

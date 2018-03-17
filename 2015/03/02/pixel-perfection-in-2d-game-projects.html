@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Pixel perfection in 2D game projects | Lea Hayes</title>
+<meta property="og:title" content="Pixel perfection in 2D game projects" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Pixel perfection can be a little more complicated to achieve when using a 3D game engine than one might initially think. There are many small contributing factors to unwanted side effects such as edge bleeding, fuzziness, flickering edges, non-uniformly shaped pixels, inconsistently shaped pixels, etc. To make things harder the solutions and workarounds often vary on a case by case basis." />
+<meta property="og:description" content="Pixel perfection can be a little more complicated to achieve when using a 3D game engine than one might initially think. There are many small contributing factors to unwanted side effects such as edge bleeding, fuzziness, flickering edges, non-uniformly shaped pixels, inconsistently shaped pixels, etc. To make things harder the solutions and workarounds often vary on a case by case basis." />
+<link rel="canonical" href="/2015/03/02/pixel-perfection-in-2d-game-projects.html" />
+<meta property="og:url" content="/2015/03/02/pixel-perfection-in-2d-game-projects.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-03-02T00:00:00+00:00" />
+<script type="application/ld+json">
+{"name":null,"description":"Pixel perfection can be a little more complicated to achieve when using a 3D game engine than one might initially think. There are many small contributing factors to unwanted side effects such as edge bleeding, fuzziness, flickering edges, non-uniformly shaped pixels, inconsistently shaped pixels, etc. To make things harder the solutions and workarounds often vary on a case by case basis.","author":null,"@type":"BlogPosting","url":"/2015/03/02/pixel-perfection-in-2d-game-projects.html","publisher":null,"image":null,"headline":"Pixel perfection in 2D game projects","dateModified":"2015-03-02T00:00:00+00:00","datePublished":"2015-03-02T00:00:00+00:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2015/03/02/pixel-perfection-in-2d-game-projects.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Pixel perfection in 2D game projects</h1>
+    <p class="post__meta">
+      <time datetime="2015-03-02T00:00:00+00:00" itemprop="datePublished">
+        
+        Mar 2, 2015
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>Pixel perfection can be a little more complicated to achieve when using a 3D game engine
+than one might initially think. There are many small contributing factors to unwanted
+side effects such as edge bleeding, fuzziness, flickering edges, non-uniformly shaped
+pixels, inconsistently shaped pixels, etc. To make things harder the solutions and
+workarounds often vary on a case by case basis.</p>
+
+<p>Before I go into this topic I just wanted to note that a lot of these things come down to
+the style and design choices of your games. There aren’t really any right or wrong styles
+but depending upon what you are aiming for you may find some of these things to be issues.
+This post reflects some of the lessons that I’ve learnt from working with pixel art and I
+hope that they will be useful to others!</p>
+
+<hr />
+
+<p><strong>Contents</strong></p>
+
+<ul id="markdown-toc">
+  <li><a href="#pixel-art-vs-retro-pixel-art" id="markdown-toc-pixel-art-vs-retro-pixel-art">Pixel art vs Retro-pixel art</a></li>
+  <li><a href="#some-of-the-challenges" id="markdown-toc-some-of-the-challenges">Some of the challenges</a>    <ul>
+      <li><a href="#fuzzy-pixels" id="markdown-toc-fuzzy-pixels">Fuzzy pixels</a></li>
+      <li><a href="#edge-bleeding-and-flickering-edges" id="markdown-toc-edge-bleeding-and-flickering-edges">Edge bleeding and flickering edges</a></li>
+      <li><a href="#irregular-shaped-pixels" id="markdown-toc-irregular-shaped-pixels">Irregular shaped pixels</a></li>
+      <li><a href="#retro-pixels-with-consistent-dimensions" id="markdown-toc-retro-pixels-with-consistent-dimensions">Retro pixels with consistent dimensions</a></li>
+      <li><a href="#sub-pixel-placement-and-pixel-snapping" id="markdown-toc-sub-pixel-placement-and-pixel-snapping">Sub-pixel placement and pixel snapping</a></li>
+      <li><a href="#rotating-sprites" id="markdown-toc-rotating-sprites">Rotating sprites</a></li>
+    </ul>
+  </li>
+  <li><a href="#tools-to-tackle-these-challenges" id="markdown-toc-tools-to-tackle-these-challenges">Tools to tackle these challenges</a>    <ul>
+      <li><a href="#pixel-perfect-camera---basics" id="markdown-toc-pixel-perfect-camera---basics">Pixel perfect camera - basics</a></li>
+      <li><a href="#pixel-perfect-camera---controlling-viewport-coverage" id="markdown-toc-pixel-perfect-camera---controlling-viewport-coverage">Pixel perfect camera - controlling viewport coverage</a></li>
+      <li><a href="#pixel-perfect-camera---zoom-factor" id="markdown-toc-pixel-perfect-camera---zoom-factor">Pixel perfect camera - zoom factor</a></li>
+      <li><a href="#pixel-perfect-camera---dealing-with-uneven-resolutions" id="markdown-toc-pixel-perfect-camera---dealing-with-uneven-resolutions">Pixel perfect camera - dealing with uneven resolutions</a></li>
+      <li><a href="#pixel-snapping-with-a-script" id="markdown-toc-pixel-snapping-with-a-script">Pixel snapping with a script</a></li>
+      <li><a href="#pixel-snapping-with-a-shader" id="markdown-toc-pixel-snapping-with-a-shader">Pixel snapping with a shader</a></li>
+      <li><a href="#using-a-render-texture-to-upscale-with-point-filtering" id="markdown-toc-using-a-render-texture-to-upscale-with-point-filtering">Using a render texture to upscale with point filtering</a></li>
+    </ul>
+  </li>
+  <li><a href="#summary" id="markdown-toc-summary">Summary</a></li>
+</ul>
+
+<h2 id="pixel-art-vs-retro-pixel-art">Pixel art vs Retro-pixel art</h2>
+
+<p>First off I wanted to start this post by defining what I mean when I refer to <strong>pixel art</strong>
+and <strong>retro-pixel art</strong> since these are two very different art styles that typically need
+to be treated differently; although some of the techniques that I write about in this post
+apply nicely to both.</p>
+
+<p><img src="/assets/blog/2015/03/02/pixel-vs-retro-pixel.png" alt="Pixel art versus retro-pixel art" /></p>
+
+<ul>
+  <li>
+    <p><strong>Pixel art</strong> is often shown at different scales be this simply to fill larger
+resolutions or because sprites are scaled during play. With this art style it is often
+desirable to take advantage of texture filtering (for instance, bilinear interpolation)
+so that the art doesn’t break down to look pixely.</p>
+  </li>
+  <li>
+    <p><strong>Retro-pixel art</strong> has that amazing old school look and feel where source pixels are
+magnified without any filtering (aka point filtering). Whilst normally provided in
+raster form as pre-drawn artwork, it is also worth noting that things like render
+textures and image processing effects can be employed to make 3D models and high-res
+vector-like artwork appear as though it’s <strong>retro-pixel</strong>.</p>
+  </li>
+</ul>
+
+<h2 id="some-of-the-challenges">Some of the challenges</h2>
+
+<p>There are a lot of factors that contribute to imperfections when it comes to <strong>pixel art</strong>
+and <strong>retro-pixel art</strong>. Some of the factors are more obscure than others especially when
+you are new to creating 2D games using a 3D rendering engine. In this section I’ll provide
+an overview of some of these issues and list some of the factors that leads to them.</p>
+
+<h3 id="fuzzy-pixels">Fuzzy pixels</h3>
+
+<p>One of the first issues that you may encounter when trying to get the <strong>retro-pixel</strong> look
+is unpleasantly blurred pixels:</p>
+
+<p><img src="/assets/blog/2015/03/02/challenge-blurry.png" alt="Comparison of blurry and sharp pixel art" /></p>
+
+<p>There are a few things that can lead to blurry pixels:</p>
+
+<ul>
+  <li>
+    <p>Texture filtering is being used to smoothly interpolate the pixel art. Typically this
+can be disabled by using “Point” filtering.</p>
+  </li>
+  <li>
+    <p>Mip-maps are being generated for the pixel art. Since mip-maps are generated by scaling
+the texture they will usually appear blurry. There isn’t usually much reason to have
+mip-maps enabled for <strong>retro pixel</strong> art games.</p>
+  </li>
+  <li>
+    <p>Lossy image compression can also lead to blurry pixels.</p>
+  </li>
+  <li>
+    <p>The artwork is not packed into a Power-Of-Two (POT) atlas texture. In Unity this can
+often be fixed using the built-in <a href="https://docs.unity3d.com/Manual/SpritePacker.html">sprite packer</a> feature or by using a third-party tool
+such as <a href="https://www.codeandweb.com/texturepacker">TexturePacker</a>.</p>
+  </li>
+  <li>
+    <p>Where artwork is positioned in world space between pixels (i.e. sub-pixel alignment).</p>
+  </li>
+</ul>
+
+<h3 id="edge-bleeding-and-flickering-edges">Edge bleeding and flickering edges</h3>
+
+<p>This problem is often quite subtle with <strong>retro-pixel art</strong> since the issue is only
+visible when the camera or sprites are in very specific positions which vary with the
+game’s output resolution. Edges will appear and disappear as the player moves around the
+game’s world creating an odd flickering effect.</p>
+
+<p>With <strong>pixel art</strong> the problem is a little more obvious since although the random flicker
+will still occur, you will often notice unusual tinting and blurring around the edges of
+tileable images that are packed into texture atlases.</p>
+
+<p><img src="/assets/blog/2015/03/02/challenge-bleed.gif" alt="Demonstration of flickering edges" /></p>
+
+<p>This issue occurs because the edge pixels of adjacently packed images are interpolated.
+This can occur due to any of the factors listed in the <a href="#fuzzy-pixels">Fuzzy pixels</a>
+section above.</p>
+
+<p>The problem can be remedied by padding each packed sprite with either a border of
+transparent pixels (in the case of non-tileable artwork) or by extruding edge pixels
+(clamping) or by duplicating pixels from the opposite side of the tile (wrapping).
+Clamping is probably the easiest option since texture packing tools usually provide this
+as an option.</p>
+
+<p>With <strong>retro-pixel art</strong> you can actually get away without padding tileable artwork if you
+have pixel perfect placement of both the camera and the drawn sprites. Although padding
+the artwork is still a good easy option.</p>
+
+<h3 id="irregular-shaped-pixels">Irregular shaped pixels</h3>
+
+<p>If you take a screenshot of your game and zoom in you may find that the widths and heights
+of pixels are irregular on some rows and columns of the image. This is a visual artifact
+that I find particularly ugly in <strong>retro-pixel art</strong> games:</p>
+
+<p><img src="/assets/blog/2015/03/02/challenge-irregular.png" alt="Irregular pixel sizes" /></p>
+
+<p>There are a few things that can lead to this problem:</p>
+
+<ul>
+  <li>
+    <p>The size of the viewport is not divisible by the number of pixels that you are
+attempting to squash into it. The render engine is forced to squash or stretch some of
+the pixels so that they fit. This problem can be remedied by padding the edge of the
+display with extra blank pixels.</p>
+  </li>
+  <li>
+    <p>The camera and/or artwork position is not pixel perfect. This can be remedied by using
+pixel perfect camera alignment and if needed by using pixel snapping on the rendered
+artwork.</p>
+  </li>
+</ul>
+
+<h3 id="retro-pixels-with-consistent-dimensions">Retro pixels with consistent dimensions</h3>
+
+<p>When working with <strong>retro-pixel art</strong> it is a good idea to ensure that all sprites and
+artwork are shown at a consistent scale so that their retro-pixel sizes are consistent.</p>
+
+<p><img src="/assets/blog/2015/03/02/challenge-texel-sizel.png" alt="Comparison of background and sprite texel sizes" /></p>
+
+<p>If dynamic scaling is desirable then the issue can also be avoided by sticking to scales
+that are powers of two. For instance, a sprite that is scaled by 4 will snap nicely into
+the grid of unscaled sprites.</p>
+
+<h3 id="sub-pixel-placement-and-pixel-snapping">Sub-pixel placement and pixel snapping</h3>
+
+<p>This is basically the same as the previous issue since sprites are positioned such that
+their pixels are not aligned with the game’s other artwork. This issue can be remedied by
+snapping the physical positions of the artwork or by snapping the rendered positions of
+sprites such that they align nicely with all other artwork.</p>
+
+<p><img src="/assets/blog/2015/03/02/challenge-sub-pixel.png" alt="Comparison of sprite alignment" /></p>
+
+<h3 id="rotating-sprites">Rotating sprites</h3>
+
+<p>This one is purely a matter of taste depending upon whether you feel “rotated pixels” fit
+the style of your game.</p>
+
+<p><img src="/assets/blog/2015/03/02/challenge-rotating-sprites.png" alt="Comparison of pixels in rotated sprites" /></p>
+
+<p>There are a few ways to remedy this:</p>
+
+<ul>
+  <li>
+    <p>Provide sprite artwork with multiple drawn rotations and pick the variation that is the
+closest match with the actors actual rotation.</p>
+  </li>
+  <li>
+    <p>Render the game at a lower resolution and then upscale with point filtering. This can be
+achieved with a render texture and works nicely with higher resolution vector-like
+sprites.</p>
+  </li>
+</ul>
+
+<h2 id="tools-to-tackle-these-challenges">Tools to tackle these challenges</h2>
+
+<h3 id="pixel-perfect-camera---basics">Pixel perfect camera - basics</h3>
+
+<p>One of the most effective ways to combat the various issues mentioned above is to use a
+pixel perfect camera script. This helps to avoid edge bleeding, flickering edges and
+irregular shaped pixels.</p>
+
+<p>Orthographic projection tends to be used when working with 2D graphics since perspective
+usually isn’t desirable plus we can control the number of visible pixels that occupy the
+screen. In Unity the number of visible pixels is controlled by specifying a value for the
+camera’s <code class="highlighter-rouge">orthographicSize</code> property. If this property is set to a value of 240 then the
+camera’s viewport will cover a vertical span of 480 units in world space.</p>
+
+<p>By default Unity assigns a value of 100 to the ‘Pixels Per Unit’ property of sprites
+although I personally prefer to have 1 pixel to 1 unit of world space. The only thing that
+really matters is that you incorporate the same ratio into your pixel camera script.</p>
+
+<p>The most integral calculation for a pixel camera script is the calculation of the camera’s
+orthographic size:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">camera</span><span class="p">.</span><span class="n">orthographicSize</span> <span class="p">=</span> <span class="n">viewportHeight</span> <span class="p">/</span> <span class="p">(</span><span class="m">2f</span> <span class="p">*</span> <span class="n">viewportPixelsPerUnit</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="pixel-perfect-camera---controlling-viewport-coverage">Pixel perfect camera - controlling viewport coverage</h3>
+
+<p>Next up we have the problem of controlling how much of the game world is visible through
+the viewport; and how that content is scaled and cropped to fit any resolution:</p>
+
+<ul>
+  <li>
+    <p><strong>Standard</strong> - Do not adjust zoom amount of the pixel camera. This essentially means
+that we just use the <code class="highlighter-rouge">pixelsPerUnit</code> value as-is when calculating the camera’s
+orthographic size.</p>
+
+    <blockquote>
+
+      <p><strong>Note</strong> - Pixel sizes are <strong>consistent</strong> across the entire viewport.</p>
+
+    </blockquote>
+
+    <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">float</span> <span class="n">viewportPixelsPerUnit</span> <span class="p">=</span> <span class="n">pixelsPerUnit</span><span class="p">;</span>
+</code></pre></div>    </div>
+
+    <p><img src="/assets/blog/2015/03/02/method-standard.png" alt="'Standard' sizing method" /></p>
+  </li>
+  <li>
+    <p><strong>Fit Inside</strong> - Zoom of pixel camera is adjusted so that the target resolution fits
+inside the viewport as closely as possible without cropping. Cropping will still occur
+if the camera cannot zoom out to match the target resolution.</p>
+
+    <blockquote>
+
+      <p><strong>Note</strong> - Pixel sizes are <strong>consistent</strong> across the entire viewport.</p>
+
+    </blockquote>
+
+    <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">float</span> <span class="n">hCoverage</span> <span class="p">=</span> <span class="n">viewportWidth</span> <span class="p">/</span> <span class="n">targetViewportWidth</span><span class="p">;</span>
+<span class="kt">float</span> <span class="n">vCoverage</span> <span class="p">=</span> <span class="n">viewportHeight</span> <span class="p">/</span> <span class="n">targetViewportHeight</span><span class="p">;</span>
+<span class="kt">float</span> <span class="n">targetZoomAmount</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Floor</span><span class="p">(</span><span class="n">Mathf</span><span class="p">.</span><span class="nf">Min</span><span class="p">(</span><span class="n">hCoverage</span><span class="p">,</span> <span class="n">vCoverage</span><span class="p">));</span>
+<span class="kt">float</span> <span class="n">viewportPixelsPerUnit</span> <span class="p">=</span> <span class="n">pixelsPerUnit</span> <span class="p">*</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Max</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="n">targetZoomAmount</span><span class="p">);</span>
+</code></pre></div>    </div>
+
+    <p><img src="/assets/blog/2015/03/02/method-fit-inside.png" alt="'Fit inside' sizing method" /></p>
+  </li>
+  <li>
+    <p><strong>Crop</strong> - Zooms to accommodate the target resolution as closely as possible without
+revealing any extra pixels of the game’s world.</p>
+
+    <blockquote>
+
+      <p><strong>Note</strong> - Pixel sizes are <strong>consistent</strong> across the entire viewport.</p>
+
+    </blockquote>
+
+    <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">float</span> <span class="n">hCoverage</span> <span class="p">=</span> <span class="n">viewportWidth</span> <span class="p">/</span> <span class="n">targetViewportWidth</span><span class="p">;</span>
+<span class="kt">float</span> <span class="n">vCoverage</span> <span class="p">=</span> <span class="n">viewportHeight</span> <span class="p">/</span> <span class="n">targetViewportHeight</span><span class="p">;</span>
+<span class="kt">float</span> <span class="n">targetZoomAmount</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Ceil</span><span class="p">(</span><span class="n">Mathf</span><span class="p">.</span><span class="nf">Max</span><span class="p">(</span><span class="n">hCoverage</span><span class="p">,</span> <span class="n">vCoverage</span><span class="p">));</span>
+<span class="kt">float</span> <span class="n">viewportPixelsPerUnit</span> <span class="p">=</span> <span class="n">pixelsPerUnit</span> <span class="p">*</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Max</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="n">targetZoomAmount</span><span class="p">);</span>
+</code></pre></div>    </div>
+
+    <p><img src="/assets/blog/2015/03/02/method-crop.png" alt="'Crop' sizing method" /></p>
+  </li>
+  <li>
+    <p><strong>Crop and Squash</strong> - Stretches or squashes viewport so that the longest side of the
+viewport fits the target resolution and then crops the shortest side of the viewport.</p>
+
+    <blockquote>
+
+      <p><strong>Note</strong> - Pixel thicknesses may be <strong>irregular</strong> for some resolutions.</p>
+
+    </blockquote>
+
+    <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">float</span> <span class="n">hCoverage</span> <span class="p">=</span> <span class="n">viewportWidth</span> <span class="p">/</span> <span class="n">targetViewportWidth</span><span class="p">;</span>
+<span class="kt">float</span> <span class="n">vCoverage</span> <span class="p">=</span> <span class="n">viewportHeight</span> <span class="p">/</span> <span class="n">targetViewportHeight</span><span class="p">;</span>
+<span class="kt">float</span> <span class="n">viewportPixelsPerUnit</span> <span class="p">=</span> <span class="n">pixelsPerUnit</span> <span class="p">*</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Max</span><span class="p">(</span><span class="n">hCoverage</span><span class="p">,</span> <span class="n">vCoverage</span><span class="p">);</span>
+</code></pre></div>    </div>
+
+    <p><img src="/assets/blog/2015/03/02/method-crop-and-squash.png" alt="'Crop and Squash' sizing method" /></p>
+  </li>
+  <li>
+    <p><strong>Fixed Height</strong> - Stretches or squashes viewport vertically so that a fixed number of
+pixels are shown.</p>
+
+    <blockquote>
+
+      <p><strong>Note</strong> - Pixel thicknesses may be <strong>irregular</strong> for some resolutions.</p>
+
+    </blockquote>
+
+    <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">viewportHeight</span> <span class="p">=</span> <span class="n">targetViewportHeight</span><span class="p">;</span>
+</code></pre></div>    </div>
+
+    <p><img src="/assets/blog/2015/03/02/method-fixed-height.png" alt="'Fixed Height' sizing method" /></p>
+  </li>
+  <li>
+    <p><strong>Fixed Width</strong> - Stretches or squashes viewport horizontally so that a fixed number of
+pixels are shown.</p>
+
+    <blockquote>
+
+      <p><strong>Note</strong> - Pixel thicknesses may be <strong>irregular</strong> for some resolutions.</p>
+
+    </blockquote>
+
+    <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">viewportHeight</span> <span class="p">=</span> <span class="n">targetViewportWidth</span> <span class="p">/</span> <span class="n">viewportWidth</span> <span class="p">*</span> <span class="n">viewportHeight</span><span class="p">;</span>
+</code></pre></div>    </div>
+
+    <p><img src="/assets/blog/2015/03/02/method-fixed-width.png" alt="'Fixed Width' sizing method" /></p>
+  </li>
+</ul>
+
+<h3 id="pixel-perfect-camera---zoom-factor">Pixel perfect camera - zoom factor</h3>
+
+<p>If desired an arbitary zoom amount can be factored in by multiplying the value of
+<code class="highlighter-rouge">viewportPixelsPerUnit</code> from above:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">viewportPixelsPerUnit</span> <span class="p">*=</span> <span class="n">zoomAmount</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="pixel-perfect-camera---dealing-with-uneven-resolutions">Pixel perfect camera - dealing with uneven resolutions</h3>
+
+<p>This works well for common screen resolutions although if you create a build of your game
+that has a resizable window or for a target platform that has an odd screen resolution
+(not evenly divisible by 2) then you will find that all of the problems the pixel camera
+was striving to solve suddenly all come back.</p>
+
+<p>Fortunately there is a fairly easy workaround to this problem! Simply padding the border
+of the viewport with blank pixels allows you to maintain an even viewport size regardless
+of the actual screen resolution:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Rect</span> <span class="n">pixelRect</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Rect</span><span class="p">();</span>
+<span class="n">pixelRect</span><span class="p">.</span><span class="n">width</span> <span class="p">=</span> <span class="n">Screen</span><span class="p">.</span><span class="n">width</span><span class="p">;</span>
+<span class="n">pixelRect</span><span class="p">.</span><span class="n">height</span> <span class="p">=</span> <span class="n">Screen</span><span class="p">.</span><span class="n">height</span><span class="p">;</span>
+
+<span class="c1">// Pad uneven viewport size with blank row/column of pixels to make size even.</span>
+<span class="k">if</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">pixelRect</span><span class="p">.</span><span class="n">width</span> <span class="p">%</span> <span class="m">2</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">--</span><span class="n">pixelRect</span><span class="p">.</span><span class="n">width</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">pixelRect</span><span class="p">.</span><span class="n">height</span> <span class="p">%</span> <span class="m">2</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">--</span><span class="n">pixelRect</span><span class="p">.</span><span class="n">height</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">camera</span><span class="p">.</span><span class="n">pixelRect</span> <span class="p">=</span> <span class="n">pixelRect</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="pixel-snapping-with-a-script">Pixel snapping with a script</h3>
+
+<p>Objects can be aligned to the game’s pixel grid by rounding it so that it snaps into place.
+This calculation only needs to be performed the one time for static objects although for
+dynamic objects can be re-calculated with each movement.</p>
+
+<p>It is useful to snap the position of the camera to display pixels (these are potentially
+smaller than retro-pixels for <strong>retro-pixel art</strong> since each retro-pixel is formed of many
+physical display pixels).</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">Vector3</span> <span class="nf">AlignWorldPointToPixel</span><span class="p">(</span><span class="n">Vector3</span> <span class="n">position</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">float</span> <span class="n">ppu</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">PixelsPerUnit</span><span class="p">;</span>
+    <span class="n">position</span><span class="p">.</span><span class="n">x</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Round</span><span class="p">(</span><span class="n">ppu</span> <span class="p">*</span> <span class="n">position</span><span class="p">.</span><span class="n">x</span><span class="p">)</span> <span class="p">/</span> <span class="n">ppu</span><span class="p">;</span>
+    <span class="n">position</span><span class="p">.</span><span class="n">y</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Round</span><span class="p">(</span><span class="n">ppu</span> <span class="p">*</span> <span class="n">position</span><span class="p">.</span><span class="n">y</span><span class="p">)</span> <span class="p">/</span> <span class="n">ppu</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">position</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>An object’s position can then be snapped with a script like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">void</span> <span class="nf">Update</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nf">SnapNow</span><span class="p">();</span>
+
+    <span class="k">if</span> <span class="p">(!</span><span class="k">this</span><span class="p">.</span><span class="n">EveryFrame</span> <span class="p">&amp;&amp;</span> <span class="n">Application</span><span class="p">.</span><span class="n">isPlaying</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">enabled</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">protected</span> <span class="n">Vector3</span> <span class="nf">SnapPosition</span><span class="p">(</span><span class="n">Vector3</span> <span class="n">position</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">pixelCamera</span> <span class="p">=</span> <span class="n">PixelCamera</span><span class="p">.</span><span class="n">MainInstance</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">pixelCamera</span><span class="p">.</span><span class="nf">AlignWorldPointToPixel</span><span class="p">(</span><span class="n">position</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">void</span> <span class="nf">SnapNow</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">Vector3</span> <span class="n">newPosition</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="nf">SnapPosition</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">position</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">newPosition</span> <span class="p">!=</span> <span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">position</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">position</span> <span class="p">=</span> <span class="n">newPosition</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If the pivot point of your sprite isn’t located in one of the sprite’s corners then you
+will want to counter by offsetting the pivot before and after snapping the sprite’s
+position in world space:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">static</span> <span class="n">Vector2</span> <span class="nf">CalculateSpritePivotCorrectionOffset</span><span class="p">(</span><span class="n">Sprite</span> <span class="n">sprite</span><span class="p">,</span> <span class="kt">float</span> <span class="n">ppu</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Vector2</span> <span class="n">spritePixelPivot</span> <span class="p">=</span> <span class="n">sprite</span><span class="p">.</span><span class="n">bounds</span><span class="p">.</span><span class="n">min</span><span class="p">;</span>
+    <span class="n">spritePixelPivot</span><span class="p">.</span><span class="n">x</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Abs</span><span class="p">(</span><span class="n">spritePixelPivot</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+    <span class="n">spritePixelPivot</span><span class="p">.</span><span class="n">y</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Abs</span><span class="p">(</span><span class="n">spritePixelPivot</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+
+    <span class="n">Vector2</span> <span class="n">offset</span><span class="p">;</span>
+    <span class="n">offset</span><span class="p">.</span><span class="n">x</span> <span class="p">=</span> <span class="n">spritePixelPivot</span><span class="p">.</span><span class="n">x</span> <span class="p">-</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Round</span><span class="p">(</span><span class="n">spritePixelPivot</span><span class="p">.</span><span class="n">x</span><span class="p">)</span> <span class="p">*</span> <span class="n">ppu</span><span class="p">;</span>
+    <span class="n">offset</span><span class="p">.</span><span class="n">y</span> <span class="p">=</span> <span class="n">spritePixelPivot</span><span class="p">.</span><span class="n">y</span> <span class="p">-</span> <span class="n">Mathf</span><span class="p">.</span><span class="nf">Round</span><span class="p">(</span><span class="n">spritePixelPivot</span><span class="p">.</span><span class="n">y</span><span class="p">)</span> <span class="p">*</span> <span class="n">ppu</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">offset</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">protected</span> <span class="n">Vector3</span> <span class="nf">SnapPosition</span><span class="p">(</span><span class="n">Vector3</span> <span class="n">position</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Vector3</span> <span class="n">offset</span> <span class="p">=</span> <span class="n">Vector3</span><span class="p">.</span><span class="n">zero</span><span class="p">;</span>
+
+    <span class="kt">var</span> <span class="n">pixelCamera</span> <span class="p">=</span> <span class="n">PixelCamera</span><span class="p">.</span><span class="n">MainInstance</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">ppu</span> <span class="p">=</span> <span class="n">pixelCamera</span><span class="p">.</span><span class="n">PixelsPerUnit</span><span class="p">;</span>
+
+    <span class="c1">// Correct offset of the current position by snapping pivot of sprite?</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">SnapSpritePivot</span> <span class="p">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="n">spriteRenderer</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">sprite</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">spriteRenderer</span><span class="p">.</span><span class="n">sprite</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sprite</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">offset</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="nf">CalculateSpritePivotCorrectionOffset</span><span class="p">(</span><span class="n">sprite</span><span class="p">,</span> <span class="n">ppu</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">pixelCamera</span><span class="p">.</span><span class="nf">AlignWorldPointToPixel</span><span class="p">(</span><span class="n">position</span> <span class="p">-</span> <span class="n">offset</span><span class="p">)</span> <span class="p">+</span> <span class="n">offset</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>When applied naively to dynamic objects you will probably notice that the movement
+velocity of the dynamic object is affected in an undesirable way. There are two ways to
+workaround this so that the motion of the object is tweened correctly and maintains the
+intended sub-pixel motion:</p>
+
+<ol>
+  <li>
+    <p>Store and maintain the physical position of the object in a separate variable so that
+the object’s visual transform can be snapped without affecting the object’s logical
+position.</p>
+  </li>
+  <li>
+    <p>Perform pixel snapping right at the end of each frame (before the frame is drawn) and
+then revert that calculation at the start of the next frame. Once setup this approach
+is a little more convenient but obviously a little more involved.</p>
+  </li>
+</ol>
+
+<h3 id="pixel-snapping-with-a-shader">Pixel snapping with a shader</h3>
+
+<p>Another option is to perform this pixel snapping on the GPU by using a shader that has
+pixel snapping support. Unity’s built-in shader has a “Pixel Snap” toggle which causes
+the sprite to be aligned with screen pixels which is a quick way to remedy a lot of the
+issues that I described at the start of this post.</p>
+
+<p>Of course you might want to create a custom shader that calculates the pixel snapping in
+a slightly different way. I would suggest using one of the Unity shaders as a starting
+point and then tweaking since aligning with screen pixels is often useful. For example,
+this can help to fix edge bleeding on <strong>retro-pixel art</strong> although often multiple
+solutions have to be applied to completely fix edge bleeding since there are many
+contributing factors to that.</p>
+
+<h3 id="using-a-render-texture-to-upscale-with-point-filtering">Using a render texture to upscale with point filtering</h3>
+
+<p>An effective tool when working with <strong>retro-pixel art</strong> is to assign a render texture of a
+lower resolution to your camera using point filtering so that the camera output is
+converted from <strong>pixel art</strong> to <strong>retro-pixel art</strong>. In the following illustration I put
+a 3D sphere primitive into the scene which appears pixely in the game view:</p>
+
+<p><img src="/assets/blog/2015/03/02/render-texture.png" alt="Demonstration of using a render texture to upscale" /></p>
+
+<p>With this technique you can make vector-like artwork appear as though it’s drawn using
+old-skewl retro-pixels. This works particularly well for artwork that doesn’t have too much
+face detail.</p>
+
+<p>Since all of the game’s output is rendered to a lower resolution and then upscaled this
+ensures that all pixels are perfectly aligned. Although it is still useful to ensure that
+the camera and object positions are pixel aligned since otherwise you may notice artifacts
+where fine details appear and vanish with movement. This happens since such detail is
+temporarily lost because it’s somewhere between the two adjacent output pixels as shown in
+the following animated GIF with a circle that has a fine red line down the middle:</p>
+
+<p><img src="/assets/blog/2015/03/02/render-texture-flickers.gif" alt="Fine detail flickering when using render texture" /></p>
+
+<p>There is a lot of freedom in terms of how you want to use render textures. For instance
+you might decide that you only want the main game area to be drawn as retro-pixels so that
+the game’s UI can be drawn at a higher smoother resolution.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this post I’ve looked at a number of issues that can rear their ugly heads when working
+with 2D artwork and have listed some of the causes and some of the ways that they can be
+remedied. This is by no means a complete list and I welcome readers to comment with issues
+and remedies that they have encountered!</p>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Reversi game made using J2ME | Lea Hayes</title>
+<meta property="og:title" content="Reversi game made using J2ME" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Since I had fun making a checkers game previously I decided to make a reversi game, again using J2ME. Unlike checkers, reversi is actually a game that I’m reasonably good at! The game has difficulty settings ranging from Novice to Master and a couple of skins." />
+<meta property="og:description" content="Since I had fun making a checkers game previously I decided to make a reversi game, again using J2ME. Unlike checkers, reversi is actually a game that I’m reasonably good at! The game has difficulty settings ranging from Novice to Master and a couple of skins." />
+<link rel="canonical" href="/2010/06/23/reversi-game-made-using-j2me.html" />
+<meta property="og:url" content="/2010/06/23/reversi-game-made-using-j2me.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2010-06-23T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"Since I had fun making a checkers game previously I decided to make a reversi game, again using J2ME. Unlike checkers, reversi is actually a game that I’m reasonably good at! The game has difficulty settings ranging from Novice to Master and a couple of skins.","author":null,"@type":"BlogPosting","url":"/2010/06/23/reversi-game-made-using-j2me.html","publisher":null,"image":null,"headline":"Reversi game made using J2ME","dateModified":"2010-06-23T00:00:00+01:00","datePublished":"2010-06-23T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2010/06/23/reversi-game-made-using-j2me.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Reversi game made using J2ME</h1>
+    <p class="post__meta">
+      <time datetime="2010-06-23T00:00:00+01:00" itemprop="datePublished">
+        
+        Jun 23, 2010
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>Since I had fun making a checkers game previously I decided to make a reversi game, again
+using J2ME. Unlike checkers, reversi is actually a game that I’m reasonably good at! The
+game has difficulty settings ranging from Novice to Master and a couple of skins.</p>
+
+<p><img src="/assets/blog/2010/06/23/reversi.png" alt="Screenshots of game" /></p>
+
+<p>I even added a game mode where you can watch the CPU play against itself!</p>
+
+<p><img src="/assets/blog/2010/06/23/ai.gif" alt="Animation showing CPU vs CPU" /></p>
+
+<p>The AI is again implemented using the <a href="https://en.wikipedia.org/w/index.php?title=NegaScout">negascout</a> algorithm although I felt that the
+easiest difficulty was still a little too difficult. I created a separate AI for the
+easiest difficulty setting which selects from possible moves at random.</p>
+
+<p><img src="/assets/blog/2010/06/23/player-classes.png" alt="Overview of player classes" /></p>
+
+<p>I constructed and animated the counter model using 3D Studio Max. Each frame was rendered
+to a separate image file which were then stitched together into a spritesheet using
+Photoshop. I included the spritesheet at several resolutions due to the variety of screen
+sizes.</p>
+
+<p><img src="/assets/blog/2010/06/23/counter.png" alt="Counter spritesheet" /></p>
+
+<p>The counter animations are rendered using a <code class="highlighter-rouge">TimerTask</code> thread at 16 frames per second.
+The animation is smooth and doesn’t eat up too much battery power since the display is not
+being redrawn unless the pieces are actually being animated.</p>
+
+<p>I included one of the skins that I made for my checkers game in addition to a more
+traditional style green felt grid. I would have included the wooden skin as well except
+the counters were a little difficult to see against that background.</p>
+
+<p><img src="/assets/blog/2010/06/23/skins.png" alt="Screenshots of the different skins" /></p>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/j2me">j2me</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/java">java</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

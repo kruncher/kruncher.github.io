@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Ordered dictionary for Unity | Lea Hayes</title>
+<meta property="og:title" content="Ordered dictionary for Unity" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="When working on projects it is often useful to have some sort of asset that maps values to keys. Since Unity doesn’t currently support the serialization of dictionaries this is something that I either try to avoid needing entirely or that I end up having to reinvent each time by implementing the ISerializationCallbackReceiver interface following the example in Unity’s documentation." />
+<meta property="og:description" content="When working on projects it is often useful to have some sort of asset that maps values to keys. Since Unity doesn’t currently support the serialization of dictionaries this is something that I either try to avoid needing entirely or that I end up having to reinvent each time by implementing the ISerializationCallbackReceiver interface following the example in Unity’s documentation." />
+<link rel="canonical" href="/2015/07/09/ordered-dictionary-for-unity.html" />
+<meta property="og:url" content="/2015/07/09/ordered-dictionary-for-unity.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-07-09T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"When working on projects it is often useful to have some sort of asset that maps values to keys. Since Unity doesn’t currently support the serialization of dictionaries this is something that I either try to avoid needing entirely or that I end up having to reinvent each time by implementing the ISerializationCallbackReceiver interface following the example in Unity’s documentation.","author":null,"@type":"BlogPosting","url":"/2015/07/09/ordered-dictionary-for-unity.html","publisher":null,"image":null,"headline":"Ordered dictionary for Unity","dateModified":"2015-07-09T00:00:00+01:00","datePublished":"2015-07-09T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2015/07/09/ordered-dictionary-for-unity.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Ordered dictionary for Unity</h1>
+    <p class="post__meta">
+      <time datetime="2015-07-09T00:00:00+01:00" itemprop="datePublished">
+        
+        Jul 9, 2015
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>When working on projects it is often useful to have some sort of asset that maps values to
+keys. Since Unity doesn’t currently support the serialization of dictionaries this is
+something that I either try to avoid needing entirely or that I end up having to reinvent
+each time by implementing the <a href="https://docs.unity3d.com/ScriptReference/ISerializationCallbackReceiver.html">ISerializationCallbackReceiver</a> interface following the
+<a href="https://docs.unity3d.com/ScriptReference/ISerializationCallbackReceiver.html">example</a> in Unity’s documentation.</p>
+
+<p>To ease this workflow I implemented a custom <code class="highlighter-rouge">ScriptableObject</code> class which provided
+reusable ordered dictionary editing. Whilst this was a reasonably good solution for a lot
+of use cases it was difficult to use with a recent project because it was difficult to
+maintain all of the separate .asset files.</p>
+
+<p>One of the features that I really wanted was to have each key and value drawn to the
+editor UI using <a href="https://docs.unity3d.com/ScriptReference/EditorGUI.PropertyField.html">EditorGUI.PropertyField</a> since this way they are drawn using custom
+property drawers. This is nice because it allows specialized editors to be developed
+independently from the ordered dictionary itself.</p>
+
+<p><img src="/assets/blog/2015/07/09/screenshot.png" alt="Screenshot of ordered dictionary" /></p>
+
+<p>The biggest difficulty with this was allowing for the “New Entry” input along the bottom.
+I found that the best solution was to define a singleton <code class="highlighter-rouge">ScriptableObject</code> that holds
+one occurrence of the key/value pair so that it can be drawn using the same property
+drawers as the main control.</p>
+
+<p>The same “New Entry” input object is used for all ordered dictionary fields (of the same
+key/value types). The user can only be inputting a new entry on one ordered dictionary
+field at any given time. Each time the user clicks the button to start inputting a new
+entry the “New Entry” input object is cleared and becomes associated with the ‘now’ active
+ordered dictionary using its control ID.</p>
+
+<p>Since Unity’s serialization system doesn’t support the serialization of generic types it
+is necessary to create a little boilerplate for each unique key/value pair type. I created
+a little <a href="http://rotorz.com/unity/misc/ordered-dictionary-boilerplate-generator">online tool</a> to automate the creation of this.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Boilerplate for the editable entry singleton.</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">EditableOrderedDictionary_string_Sprite</span>
+    <span class="p">:</span> <span class="n">EditableEntry</span><span class="p">&lt;</span><span class="n">OrderedDictionary_string_Sprite</span><span class="p">&gt;</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="c1">// Boilerplate for the serializable ordered dictionary.</span>
+<span class="na">[Serializable]</span>
+<span class="na">[EditableEntry(typeof(EditableOrderedDictionary_string_Sprite))]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">OrderedDictionary_string_Sprite</span>
+    <span class="p">:</span> <span class="n">OrderedDictionary</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="n">Sprite</span><span class="p">&gt;</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>With the above boilerplate a custom sprite library asset can then be created with ease:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">[CreateAssetMenu]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">SpriteLibraryAsset</span> <span class="p">:</span> <span class="n">ScriptableObject</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="n">OrderedDictionary_string_Sprite</span> <span class="n">sprites</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And of course, the same can be done using any type for the ordered dictionary’s key and
+value so long as they can be serialized by Unity. As with regular dictionaries; it is a
+good idea to have custom value types (structs) implement the <a href="https://msdn.microsoft.com/en-us/library/ms131187(v=vs.110).aspx">IEquatable&lt;T&gt;</a>
+interface so that it doesn’t generate excessive amounts of garbage by boxing the values of
+keys over and over again.</p>
+
+<p>If Unity add serialization support for generic types then the above boilerplate would
+nolonger be necessary since <code class="highlighter-rouge">OrderedDictionary&lt;string, Sprite&gt;</code> could be used directly.</p>
+
+<p>Whilst the ability to explicitly order the entries of a dictionary isn’t useful for all
+use cases; it does help to provide a consistent editing experience. It’s also allows the
+people that input their data to organize the entries as desired.</p>
+
+<p>I released this library as <a href="https://bitbucket.org/rotorz/ordered-dictionary-for-unity">open source</a> on Bitbucket 💗</p>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/imgui">imgui</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

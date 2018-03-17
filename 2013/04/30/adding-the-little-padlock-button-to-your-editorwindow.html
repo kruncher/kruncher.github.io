@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Adding the little padlock button to your EditorWindow! | Lea Hayes</title>
+<meta property="og:title" content="Adding the little padlock button to your EditorWindow!" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="One of the less well known features of Unity is the little padlock button that lives in the upper-right corner of the Inspector window. This button is fantastic because it causes the inspector to ignore future selections and thus allowing you to select other objects without affecting the contents of the inspector." />
+<meta property="og:description" content="One of the less well known features of Unity is the little padlock button that lives in the upper-right corner of the Inspector window. This button is fantastic because it causes the inspector to ignore future selections and thus allowing you to select other objects without affecting the contents of the inspector." />
+<link rel="canonical" href="/2013/04/30/adding-the-little-padlock-button-to-your-editorwindow.html" />
+<meta property="og:url" content="/2013/04/30/adding-the-little-padlock-button-to-your-editorwindow.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2013-04-30T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"One of the less well known features of Unity is the little padlock button that lives in the upper-right corner of the Inspector window. This button is fantastic because it causes the inspector to ignore future selections and thus allowing you to select other objects without affecting the contents of the inspector.","author":null,"@type":"BlogPosting","url":"/2013/04/30/adding-the-little-padlock-button-to-your-editorwindow.html","publisher":null,"image":null,"headline":"Adding the little padlock button to your EditorWindow!","dateModified":"2013-04-30T00:00:00+01:00","datePublished":"2013-04-30T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2013/04/30/adding-the-little-padlock-button-to-your-editorwindow.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Adding the little padlock button to your EditorWindow!</h1>
+    <p class="post__meta">
+      <time datetime="2013-04-30T00:00:00+01:00" itemprop="datePublished">
+        
+        Apr 30, 2013
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>One of the less well known features of Unity is the little padlock button that lives in
+the upper-right corner of the <strong>Inspector</strong> window. This button is fantastic because it
+causes the inspector to ignore future selections and thus allowing you to select other
+objects without affecting the contents of the inspector.</p>
+
+<p>Those who are needing (or just want the fancy little padlock!) to achieve a similar type
+of locking functionality in their own custom editor windows can simply by adding the magic
+method “ShowButton” to their editor window class. In fact, you don’t have to add a padlock,
+you could add some other icon!</p>
+
+<p><img src="/assets/blog/2013/04/30/editorwindow-lock-toggle.png" alt="Screenshot of custom editor window with lock icon." /></p>
+
+<blockquote>
+
+  <p><strong>Warning</strong> - This is non-documented functionality. Use at your own risk!</p>
+
+</blockquote>
+
+<p>Since Unity 4.0 has become possible to add custom items to the editor window popup menu
+using the <code class="highlighter-rouge">IHasCustomMenu</code> interface.</p>
+
+<p>Here is a simple example of how to achieve this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">UnityEngine</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">UnityEditor</span><span class="p">;</span>
+ 
+<span class="k">public</span> <span class="k">class</span> <span class="nc">WindowWithLockIcon</span> <span class="p">:</span> <span class="n">EditorWindow</span><span class="p">,</span> <span class="n">IHasCustomMenu</span>
+<span class="p">{</span>
+    <span class="c1">/// &lt;summary&gt;</span>
+    <span class="c1">/// Menu item to display our test window.</span>
+    <span class="c1">/// &lt;/summary&gt;</span>
+    <span class="p">[</span><span class="nf">MenuItem</span><span class="p">(</span><span class="s">"Window/Window with Lock Icon"</span><span class="p">)]</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Show</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">GetWindow</span><span class="p">&lt;</span><span class="n">WindowWithLockIcon</span><span class="p">&gt;(</span><span class="s">"Lock Test"</span><span class="p">);</span>
+    <span class="p">}</span>
+ 
+
+    <span class="c1">/// &lt;summary&gt;</span>
+    <span class="c1">/// Keep local copy of lock button style for efficiency.</span>
+    <span class="c1">/// &lt;/summary&gt;</span>
+    <span class="p">[</span><span class="n">System</span><span class="p">.</span><span class="n">NonSerialized</span><span class="p">]</span>
+    <span class="k">private</span> <span class="n">GUIStyle</span> <span class="n">lockButtonStyle</span><span class="p">;</span>
+    <span class="c1">/// &lt;summary&gt;</span>
+    <span class="c1">/// Indicates whether lock is toggled on/off.</span>
+    <span class="c1">/// &lt;/summary&gt;</span>
+    <span class="p">[</span><span class="n">System</span><span class="p">.</span><span class="n">NonSerialized</span><span class="p">]</span>
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">locked</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+ 
+    <span class="c1">/// &lt;summary&gt;</span>
+    <span class="c1">/// Magic method which Unity detects automatically.</span>
+    <span class="c1">/// &lt;/summary&gt;</span>
+    <span class="c1">/// &lt;param name="position"&gt;Position of button.&lt;/param&gt;</span>
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">ShowButton</span><span class="p">(</span><span class="n">Rect</span> <span class="n">position</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">lockButtonStyle</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">lockButtonStyle</span> <span class="p">=</span> <span class="s">"IN LockButton"</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">locked</span> <span class="p">=</span> <span class="n">GUI</span><span class="p">.</span><span class="nf">Toggle</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">locked</span><span class="p">,</span> <span class="n">GUIContent</span><span class="p">.</span><span class="n">none</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="n">lockButtonStyle</span><span class="p">);</span>
+    <span class="p">}</span>
+ 
+    <span class="c1">/// &lt;summary&gt;</span>
+    <span class="c1">/// Adds custom items to editor window context menu.</span>
+    <span class="c1">/// &lt;/summary&gt;</span>
+    <span class="c1">/// &lt;remarks&gt;</span>
+    <span class="c1">/// &lt;para&gt;This will only work for Unity 4.x+&lt;/para&gt;</span>
+    <span class="c1">/// &lt;/remarks&gt;</span>
+    <span class="c1">/// &lt;param name="menu"&gt;Context menu.&lt;/param&gt;</span>
+    <span class="k">void</span> <span class="n">IHasCustomMenu</span><span class="p">.</span><span class="nf">AddItemsToMenu</span><span class="p">(</span><span class="n">GenericMenu</span> <span class="n">menu</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">menu</span><span class="p">.</span><span class="nf">AddItem</span><span class="p">(</span><span class="k">new</span> <span class="nf">GUIContent</span><span class="p">(</span><span class="s">"Lock"</span><span class="p">),</span> <span class="k">this</span><span class="p">.</span><span class="n">locked</span><span class="p">,</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">locked</span> <span class="p">=</span> <span class="p">!</span><span class="k">this</span><span class="p">.</span><span class="n">locked</span><span class="p">;</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

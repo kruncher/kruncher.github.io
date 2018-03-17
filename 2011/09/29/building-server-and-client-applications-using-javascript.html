@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Building server and client applications using JavaScript | Lea Hayes</title>
+<meta property="og:title" content="Building server and client applications using JavaScript" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="JavaScript has become an essential tool that allows web developers to produce sophisticated web applications that often use AJAX to communicate with the server. JavaScript source code is becoming increasingly more complex and so it has become necessary for web browser developers to increase the performance of their JavaScript virtual machines." />
+<meta property="og:description" content="JavaScript has become an essential tool that allows web developers to produce sophisticated web applications that often use AJAX to communicate with the server. JavaScript source code is becoming increasingly more complex and so it has become necessary for web browser developers to increase the performance of their JavaScript virtual machines." />
+<link rel="canonical" href="/2011/09/29/building-server-and-client-applications-using-javascript.html" />
+<meta property="og:url" content="/2011/09/29/building-server-and-client-applications-using-javascript.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2011-09-29T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"JavaScript has become an essential tool that allows web developers to produce sophisticated web applications that often use AJAX to communicate with the server. JavaScript source code is becoming increasingly more complex and so it has become necessary for web browser developers to increase the performance of their JavaScript virtual machines.","author":null,"@type":"BlogPosting","url":"/2011/09/29/building-server-and-client-applications-using-javascript.html","publisher":null,"image":null,"headline":"Building server and client applications using JavaScript","dateModified":"2011-09-29T00:00:00+01:00","datePublished":"2011-09-29T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2011/09/29/building-server-and-client-applications-using-javascript.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Building server and client applications using JavaScript</h1>
+    <p class="post__meta">
+      <time datetime="2011-09-29T00:00:00+01:00" itemprop="datePublished">
+        
+        Sep 29, 2011
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>JavaScript has become an essential tool that allows web developers to produce
+sophisticated web applications that often use AJAX to communicate with the server.
+JavaScript source code is becoming increasingly more complex and so it has become
+necessary for web browser developers to increase the performance of their JavaScript
+virtual machines.</p>
+
+<p>Google Chrome features the v8 JavaScript environment which provides outstanding
+performance by compiling JavaScript into machine code (as opposed to being processed by a
+virtual machine). The performance boost is massive. V8 is released under an open-source
+license (<a href="http://code.google.com/p/v8/">http://code.google.com/p/v8/</a>) which can be compiled and used as a standalone
+JavaScript processor, or more interestingly integrated into custom applications!</p>
+
+<p>V8 could easily be integrated into an application (or game) to provide an extremely
+powerful and flexible scripting language. It is possible to map functions and classes
+between the V8 execution context and a C++ application.</p>
+
+<p>A while back I bumped into a project called <a href="https://nodejs.org/">nodejs</a>. Initially I wasn’t sure what this
+project was offering nor how it related to JavaScript. It turns out that nodejs is built
+on top of the powerful V8 JavaScript engine and provides networking capabilities that can
+be used to produce server applications extremely easily. I would thoroughly recommend
+watching the video on the project home page for some excellent tutorials.</p>
+
+<p>Here is a very simple web server written in JavaScript that can be executed using nodejs:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"http"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">response</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span> <span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"text/html"</span> <span class="p">});</span>
+  <span class="nx">response</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">'&lt;h1&gt;Hello World!&lt;/h1&gt;'</span><span class="p">);</span>
+  <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+<span class="p">});</span>
+ 
+<span class="c1">// start web server on port 8080 (http://localhost:8080)</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">8080</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This is also an excellent resource: <a href="http://www.nodebeginner.org/">http://www.nodebeginner.org/</a></p>
+
+<p>One of the things that confused me was that I thought that nodejs could only be used to
+develop web server applications. But this isn’t true because nodejs can be used to develop
+client applications that run from the command line. Better still, nodejs can be compiled
+to work on Mac, Unix and Windows.</p>
+
+<p>There are also a vast selection of modules that can be used alongside nodejs to allow
+interaction with databases, frameworks for developing powerful web servers easily. Some
+JavaScript libraries can be used by a web browser and nodejs environment when
+implementation specific features (like the DOM in a web browser, or process in nodejs) are
+not needed.</p>
+
+<p>I do not think that nodejs is a replacement for PHP at the moment because the project is
+still in its infancy. This could, however, be the case in the future once nodejs and
+various modules have had a little time to mature. It is certainly a fun project to
+experiment with.</p>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/javascript">javascript</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/nodejs">nodejs</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

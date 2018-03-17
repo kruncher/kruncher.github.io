@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Choosing a documentation solution | Lea Hayes</title>
+<meta property="og:title" content="Choosing a documentation solution" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="For a while I have been using Microsoft Word to author user guides and to be fair this has been a good solution up until now. Since beginning work on Rotorz Tile System there have been a number of product updates which have required multiple updates of the user documentation. Despite using style presets the process of maintaining consistent formatting and updating illustrations is extremely time consuming. I also feel that there is a need for a web based version of the documentation to make it easier for people to find their way around." />
+<meta property="og:description" content="For a while I have been using Microsoft Word to author user guides and to be fair this has been a good solution up until now. Since beginning work on Rotorz Tile System there have been a number of product updates which have required multiple updates of the user documentation. Despite using style presets the process of maintaining consistent formatting and updating illustrations is extremely time consuming. I also feel that there is a need for a web based version of the documentation to make it easier for people to find their way around." />
+<link rel="canonical" href="/2012/07/29/choosing-a-documentation-solution.html" />
+<meta property="og:url" content="/2012/07/29/choosing-a-documentation-solution.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2012-07-29T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"For a while I have been using Microsoft Word to author user guides and to be fair this has been a good solution up until now. Since beginning work on Rotorz Tile System there have been a number of product updates which have required multiple updates of the user documentation. Despite using style presets the process of maintaining consistent formatting and updating illustrations is extremely time consuming. I also feel that there is a need for a web based version of the documentation to make it easier for people to find their way around.","author":null,"@type":"BlogPosting","url":"/2012/07/29/choosing-a-documentation-solution.html","publisher":null,"image":null,"headline":"Choosing a documentation solution","dateModified":"2012-07-29T00:00:00+01:00","datePublished":"2012-07-29T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2012/07/29/choosing-a-documentation-solution.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Choosing a documentation solution</h1>
+    <p class="post__meta">
+      <time datetime="2012-07-29T00:00:00+01:00" itemprop="datePublished">
+        
+        Jul 29, 2012
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>For a while I have been using Microsoft Word to author user guides and to be fair this has
+been a good solution up until now. Since beginning work on Rotorz Tile System there have
+been a number of product updates which have required multiple updates of the user
+documentation. Despite using style presets the process of maintaining consistent
+formatting and updating illustrations is extremely time consuming. I also feel that there
+is a need for a web based version of the documentation to make it easier for people to
+find their way around.</p>
+
+<p>So… ultimately I required a solution that takes a number of document fragments that can
+be composed in a variety of ways to provide at least two deliverables (PDF plus web based
+documentation). After some careful thought I also decided that I would like to avoid
+directly formatting the documentation that I write to save valuable time; this should be
+handled automatically by the documentation solution.</p>
+
+<p>I considered a number of input formats for which to compose my documentation:</p>
+
+<ul>
+  <li>
+    <p><strong>HTML5</strong> (<a href="http://www.html5rocks.com">http://www.html5rocks.com</a>) – Utilize the semantic elements and attributes
+that are offered by the HTML5 specification to author documentation. Each section of the
+documentation would be written into separate HTML5 files which can then be composed into
+a PDF file and structured web pages using a document map (perhaps written in XML).</p>
+
+    <p>Whilst there are a number of WYSIWYG (<strong>W</strong>hat-<strong>Y</strong>ou-<strong>S</strong>ee-<strong>I</strong>s-<strong>W</strong>hat-<strong>Y</strong>ou-<strong>G</strong>et)
+editors, from my experience such editors tend to add a lot of junk into the markup. I
+would be inclined to input documentation by entering markup directly and then create a
+custom WYSIWYG editor using something like <a href="http://aloha-editor.org">http://aloha-editor.org</a>. The batch
+processor would automatically add syntax highlighting to code listings plus expand short
+tags. The output HTML files (plus the document map) would be glued together using some
+simple PHP scripts.</p>
+  </li>
+  <li>
+    <p><strong>Markdown</strong> (<a href="http://daringfireball.net/projects/markdown">http://daringfireball.net/projects/markdown</a>) – Avoid using XML-like
+elements and attributes and focus entirely on authoring content. Markdown processors
+generate HTML and PDF output from files written plain text conventions that became
+popularized in the early days of plain text e-mail.</p>
+
+    <p>One of the beauties of this approach is that no specialized editors are required to
+author content (though NotePad++ and BBEdit offer syntax highlighting for markdown).
+However, with simplicity comes the cost of losing the ability to express certain
+semantics. A batch processor would be required to automate the entire conversion process,
+plus to perform syntax highlighting on code listings. A document map would also be
+required to assist with PHP scripts.</p>
+  </li>
+  <li>
+    <p><strong>LaTeX</strong> (<a href="http://www.latex-project.org">http://www.latex-project.org</a>) – A very popular format for authoring
+documentation (with fantastic support for mathematical equations). Authored content can
+be converted into both PDF and HTML where content is automatically outlined.</p>
+
+    <p>There are a number of specialized WYSIWYM (<strong>W</strong>hat-<strong>Y</strong>ou-<strong>S</strong>ee-<strong>I</strong>s-<strong>W</strong>hat-<strong>Y</strong>ou-<strong>M</strong>ean)
+editors which make the process of authoring content easy. Whilst there are ways to use
+LaTeX to write modular documentation, it is a lot easier to work within a single
+document. Whilst content is structured there are again less semantic offerings
+out-of-the-box; however there are extensions like SALT (<a href="http://salt.semanticauthoring.org">http://salt.semanticauthoring.org</a>).</p>
+  </li>
+  <li>
+    <p><strong>DocBook</strong> (<a href="http://www.docbook.org">http://www.docbook.org</a>) – A popular and extensible XML-based format for
+authoring documentation with extensive semantic offerings. Documentation can be authored
+modularly into reusable parts using XInclude (<a href="http://www.sagehill.net/docbookxsl/ModularDoc.html">http://www.sagehill.net/docbookxsl/ModularDoc.html</a>).</p>
+
+    <p>There are a number of WYSIWYM editors for DocBook content, however from my findings
+these tend to be quite complex due to the rich nature of the DocBook schema. I
+personally found it easier to author documentation using a good quality XML editor (like
+the one found in Visual Studio and Oxygen).</p>
+
+    <p>The provided DocBook stylesheets can be used to generate a number of deliverables
+including HTML and PDF. Plus as an added bonus syntax highlighting in program listings
+is performed automatically for all of the popular programming languages.</p>
+  </li>
+  <li>
+    <p><strong>DITA</strong> (<a href="http://dita.xml.org">http://dita.xml.org</a>) – Another popular and extensible XML-based format for
+authoring technical documentation (user guides, tutorials, etc) using a highly modular
+topic based approach. There are several types of topic including concept, task,
+reference and the generic catch all topic. Custom specializations can also be defined
+when more granularity is required.DITA topics can be composed in a variety of ways (as
+needed) by creating one or more DITAMAP files. A map identifies which content to compose
+along with the way in which the content is to be structured. There are two types of map,
+one that is better for article-like content or simple user guides, and another that is
+designed for books.</p>
+
+    <p>The great thing about DITA is that its schema is a lot simpler than the likes of DocBook
+(meaning less of a learning curve) whilst offering a fairly decent level of semantics.</p>
+
+    <p>The official way to compile documentation is using the DITA-OT (<a href="http://dita-ot.sourceforge.net">http://dita-ot.sourceforge.net</a>)
+toolkit which uses the Saxon XSLT processor. The toolkit is primarily written using
+XSLT1 stylesheets though custom stylesheets can be created using XSLT2 stylesheets! The
+generated deliverables can be highly customized, though the process of stylizing PDF
+output using XSL:FO is more involved.</p>
+
+    <p>XML Mind (<a href="http://www.xmlmind.com">http://www.xmlmind.com</a>) also provide an open source solution to convert DITA
+into delivery formats called Ditac (http://www.xmlmind.com/ditac). Their solution seems
+far easier to customize; plus generates better quality XHTML output (using proper
+namespace). Generated documentation is also more attractive out-of-the-box. XML Mind
+also develop a fantastic WYSIWYM editor that is ideal for DITA editing. Having evaluated
+a number of DITA editors, theirs certainly seems to be the easiest to use (to me at least).</p>
+
+    <p>As a bonus, Ditac also generates an XML outline for the composited documentation!</p>
+  </li>
+</ul>
+
+<p>As you have probably guessed I went with DITA, but this was far from a simple choice. This
+decision was made having spent several days researching, experimenting with different
+options and pondering. One of the things that I love about DITA is the ability to write
+using modular topics because this does lead to a better quality of documentation. When
+writing a topic it is important to ensure that it can be fully understood when read
+independently of any other topics. This makes it very easy to reuse the same topics in
+multiple documents.</p>
+
+<p>For example, the same documentation can be reused for HTML output and PDF output. But more
+importantly the same documentation can be reused to generate specialized outputs. For
+example, you might want to create a “Quick Start” guide and a full-blown “User Guide” plus
+a “Technical Guide” that are each suited towards different needs. Content can also be
+filtered by audience (or any other attribute for that matter) so the exposure of certain
+paragraphs/sections/etc can be fully controlled.</p>
+
+<p>IBM utilize DITA heavily for their documentation and have made considerable contributions
+towards the DITA project. For anybody interested in using DITA I would strongly recommend
+reading through some of the IBM articles: <a href="http://www.ibm.com/developerworks/xml/library/x-dita1">http://www.ibm.com/developerworks/xml/library/x-dita1</a>.
+I was pleasantly surprised over the number of companies using DITA for their production
+user guides! The user guide for my camera was authored using DITA!</p>
+
+<p>I have decided to use the XML Mind DITA Converter for my user documentation because I
+prefer the quality of its implementation. It also seems to be a lot easier to customize,
+although PDF customization is still quite involved. Until I have the time to customize the
+PDF output properly I have decided to take a different approach. Instead I will output a
+single XHTML file using Ditac and then convert that output into a PDF file.</p>
+
+<ul>
+  <li>
+    <p>wkhtmltopdf (<a href="http://www.daimi.au.dk/~jakobt/#wkhtmltopdf">http://www.daimi.au.dk/~jakobt/#wkhtmltopdf</a>) is a truly fantastic project
+which can be useful in so many ways. This is an open source command line tool that
+converts HTML files into PDF files. It is possible to specify custom cover pages, toc,
+header and footers and supports some of the paged media features of CSS. The output of
+this tool is superior to that of any modern web browser and is based on the WebKit
+layout engine.</p>
+  </li>
+  <li>
+    <p>Prince (<a href="http://www.princexml.com">http://www.princexml.com</a>) is a commercial option and is perhaps the best
+choice when funding is not a problem. Prince supports full CSS3 paged media capabilities.</p>
+  </li>
+</ul>
+
+<p>There are several quirks to wkhtmltopdf, in that none of the latest distributions work
+perfectly.</p>
+
+<ul>
+  <li>
+    <p>The latest Windows release outputs a blank page for the TOC, however there is a
+workaround to this issue. The tool has an option to output the XSL stylesheet that is
+used to render the TOC. If this XSL file is specified explicitly when invoking the
+command line the TOC is rendered properly!</p>
+  </li>
+  <li>
+    <p>The latest release for OS X intermittently outputs all content as an image (instead of
+selectable text). This is not an issue with the Windows release.</p>
+  </li>
+</ul>
+
+<p>I hope that my research will be of use to others. Please feel free to comment and ask
+questions about my experiences and I will do my best to answer!</p>
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dita">dita</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/documentation">documentation</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/html">html</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/markdown">markdown</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/xml">xml</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

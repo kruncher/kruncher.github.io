@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Custom editor controls in Unity - Part 4: Property drawers | Lea Hayes</title>
+<meta property="og:title" content="Custom editor controls in Unity - Part 4: Property drawers" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Often it is nice to customize the way that some properties are presented in the inspector but you don’t necessarily want to define an entire custom inspector. Fortunately Unity has a feature that enables you to customize the drawing of properties without having to define how the entire inspector of a component should work." />
+<meta property="og:description" content="Often it is nice to customize the way that some properties are presented in the inspector but you don’t necessarily want to define an entire custom inspector. Fortunately Unity has a feature that enables you to customize the drawing of properties without having to define how the entire inspector of a component should work." />
+<link rel="canonical" href="/2015/08/27/custom-editor-controls-in-unity-part-4.html" />
+<meta property="og:url" content="/2015/08/27/custom-editor-controls-in-unity-part-4.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-08-27T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"Often it is nice to customize the way that some properties are presented in the inspector but you don’t necessarily want to define an entire custom inspector. Fortunately Unity has a feature that enables you to customize the drawing of properties without having to define how the entire inspector of a component should work.","author":null,"@type":"BlogPosting","url":"/2015/08/27/custom-editor-controls-in-unity-part-4.html","publisher":null,"image":null,"headline":"Custom editor controls in Unity - Part 4: Property drawers","dateModified":"2015-08-27T00:00:00+01:00","datePublished":"2015-08-27T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2015/08/27/custom-editor-controls-in-unity-part-4.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Custom editor controls in Unity - Part 4: Property drawers</h1>
+    <p class="post__meta">
+      <time datetime="2015-08-27T00:00:00+01:00" itemprop="datePublished">
+        
+        Aug 27, 2015
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>Often it is nice to customize the way that some properties are presented in the inspector
+but you don’t necessarily want to define an entire custom inspector. Fortunately Unity has
+a feature that enables you to customize the drawing of properties without having to define
+how the entire inspector of a component should work.</p>
+
+<p>Custom property drawers can be assigned to a specific type of value (i.e. a custom struct,
+class, enum) or to an attribute that can then be used to annotate properties where the
+custom drawer is useful.</p>
+
+<p>In this post I am going to demonstrate how to use the <code class="highlighter-rouge">MyGUI.FlagToggleGrid</code> control that
+was developed in the previous part to edit properties in a custom <code class="highlighter-rouge">MonoBehaviour</code>.</p>
+
+<p><img src="/assets/blog/2015/08/27/property-drawer.png" alt="Screenshot of the property drawer in action" /></p>
+
+<p>The first step is to implement the attribute itself:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">UnityEngine</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">FlagToggleGridAttribute</span> <span class="p">:</span> <span class="n">PropertyAttribute</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="kt">int</span> <span class="n">flagCount</span> <span class="p">=</span> <span class="m">4</span><span class="p">;</span>
+    
+
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">FlagCount</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">flagCount</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">flagCount</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The attribute can then be used to annotate the relevant properties of your behaviors:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">UnityEngine</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">NewMonoBehaviour</span> <span class="p">:</span> <span class="n">MonoBehaviour</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">bool</span> <span class="n">someOtherField</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">Space</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">FlagToggleGrid</span><span class="p">]</span>
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">defaultFlagCount</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">Space</span><span class="p">]</span>
+    <span class="p">[</span><span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">FlagCount</span> <span class="p">=</span> <span class="m">16</span><span class="p">)]</span>
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">row1</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+    <span class="p">[</span><span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">FlagCount</span> <span class="p">=</span> <span class="m">16</span><span class="p">)]</span>
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">row2</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The custom property drawer can then be associated with our <code class="highlighter-rouge">FlagToggleGridAttribute</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">UnityEditor</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">UnityEngine</span><span class="p">;</span>
+
+<span class="na">[CustomPropertyDrawer(typeof(FlagToggleGridAttribute))]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">FlagToggleGridPropertyDrawer</span> <span class="p">:</span> <span class="n">PropertyDrawer</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">override</span> <span class="kt">float</span> <span class="nf">GetPropertyHeight</span><span class="p">(</span><span class="n">SerializedProperty</span> <span class="n">property</span><span class="p">,</span> <span class="n">GUIContent</span> <span class="n">label</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="m">42f</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnGUI</span><span class="p">(</span><span class="n">Rect</span> <span class="n">position</span><span class="p">,</span> <span class="n">SerializedProperty</span> <span class="n">property</span><span class="p">,</span> <span class="n">GUIContent</span> <span class="n">label</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">attr</span> <span class="p">=</span> <span class="p">(</span><span class="n">FlagToggleGridAttribute</span><span class="p">)</span><span class="k">this</span><span class="p">.</span><span class="n">attribute</span><span class="p">;</span>
+        <span class="n">MyGUI</span><span class="p">.</span><span class="nf">FlagToggleGrid</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">property</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">attr</span><span class="p">.</span><span class="n">FlagCount</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And since the <code class="highlighter-rouge">MyGUI.FlagToggleGrid</code> control has support for <code class="highlighter-rouge">EditorGUI.showMixedValue</code> we
+see the mixed value state when multiple game objects are selected with differing values:</p>
+
+<p><img src="/assets/blog/2015/08/27/mixed-values.png" alt="Screenshot of the property drawer with mixed values" /></p>
+
+<p>See: <a href="/2015/08/28/custom-editor-controls-in-unity-part-5.html">Part 5: Custom styles</a></p>
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/imgui">imgui</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>

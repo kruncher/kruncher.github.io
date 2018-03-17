@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html class="skin-default" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Adding reorderable lists to editor interfaces in Unity | Lea Hayes</title>
+<meta property="og:title" content="Adding reorderable lists to editor interfaces in Unity" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Often I find myself in need of reorderable list functionality in my various custom editor interfaces, and so I decided to create a generalized implementation which works with generic lists List&lt;T&gt; and with SerializedProperty." />
+<meta property="og:description" content="Often I find myself in need of reorderable list functionality in my various custom editor interfaces, and so I decided to create a generalized implementation which works with generic lists List&lt;T&gt; and with SerializedProperty." />
+<link rel="canonical" href="/2013/10/10/adding-reorderable-lists-to-editor-interfaces-in-unity.html" />
+<meta property="og:url" content="/2013/10/10/adding-reorderable-lists-to-editor-interfaces-in-unity.html" />
+<meta property="og:site_name" content="Lea Hayes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2013-10-10T00:00:00+01:00" />
+<script type="application/ld+json">
+{"name":null,"description":"Often I find myself in need of reorderable list functionality in my various custom editor interfaces, and so I decided to create a generalized implementation which works with generic lists List&lt;T&gt; and with SerializedProperty.","author":null,"@type":"BlogPosting","url":"/2013/10/10/adding-reorderable-lists-to-editor-interfaces-in-unity.html","publisher":null,"image":null,"headline":"Adding reorderable lists to editor interfaces in Unity","dateModified":"2013-10-10T00:00:00+01:00","datePublished":"2013-10-10T00:00:00+01:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"/2013/10/10/adding-reorderable-lists-to-editor-interfaces-in-unity.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="alternate" type="application/rss+xml" title="Lea Hayes" href="/feed.xml">
+
+    
+  </head>
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="site-header__wrap">
+    <a class="site-badge" href="/">Lea Hayes</a>
+
+    <nav class="site-nav">
+  <ul class="site-nav__list">
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/about/">About</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/portfolio/">Portfolio</a>
+    </li>
+    
+  
+    
+    
+    <li class="site-nav__item">
+      <a class="site-nav__link" href="/blog/index.html">Blog</a>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+  </div>
+</header>
+
+
+    <main class="main-content" aria-label="Content">
+      <div class="main-content__wrap">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <nav class="blog-nav">
+  <h1 class="blog-nav__title">Blog Navigation</h1>
+  <ul class="blog-nav__list blog-nav__list--primary">
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/blog/">Posts</a></li>
+    <li class="blog-nav__item"><a class="blog-nav__link" href="/tags/">Tags</a></li>
+  </ul>
+  <ul class="blog-nav__list blog-nav__list--secondary">
+    <li class="blog-nav__item blog-nav__item--rss"><a class="blog-nav__link" href="/feed.xml">Subscribe via RSS</a></li>
+  </ul>
+</nav>
+
+
+  <header class="post__header">
+    <h1 class="post__title" itemprop="name headline">Adding reorderable lists to editor interfaces in Unity</h1>
+    <p class="post__meta">
+      <time datetime="2013-10-10T00:00:00+01:00" itemprop="datePublished">
+        
+        Oct 10, 2013
+      </time>
+    </p>
+  </header>
+
+  <div class="post__content body-content" itemprop="articleBody">
+    <p>Often I find myself in need of reorderable list functionality in my various custom editor
+interfaces, and so I decided to create a generalized implementation which works with
+generic lists <a href="http://msdn.microsoft.com/en-us/library/6sh2ey19(v=vs.90).aspx">List&lt;T&gt;</a> and with <a href="http://docs.unity3d.com/Documentation/ScriptReference/SerializedProperty.html">SerializedProperty</a>.</p>
+
+<p><img src="/assets/blog/2013/10/10/screenshot.png" alt="Screenshot of a reorderable list control" /></p>
+
+<p>This list control provides drag and drop reordering and supports mixed item heights when
+using custom property drawers. It is generally better to present lists for serialized
+properties since Unity provides automatic undo/redo support for these. You can also
+implement your very own list adapter to present entirely custom lists.</p>
+
+<p>This control is provided as open source under the MIT license and can be downloaded from
+the following repository: <a href="https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/overview">https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/overview</a></p>
+
+<p>Here is the custom editor which is used in the above screenshot:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SerializedProperty</span> <span class="n">shoppingListProperty</span><span class="p">;</span>
+<span class="n">SerializedProperty</span> <span class="n">purchasedListProperty</span><span class="p">;</span>
+ 
+<span class="k">private</span> <span class="k">void</span> <span class="nf">OnEnable</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="n">shoppingListProperty</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">serializedObject</span><span class="p">.</span><span class="nf">FindProperty</span><span class="p">(</span><span class="s">"shoppingList"</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="n">purchasedListProperty</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">serializedObject</span><span class="p">.</span><span class="nf">FindProperty</span><span class="p">(</span><span class="s">"purchasedList"</span><span class="p">);</span>
+<span class="p">}</span>
+ 
+<span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnInspectorGUI</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="n">serializedObject</span><span class="p">.</span><span class="nf">Update</span><span class="p">();</span>
+ 
+    <span class="n">ReorderableListGUI</span><span class="p">.</span><span class="nf">Title</span><span class="p">(</span><span class="s">"Shopping List"</span><span class="p">);</span>
+    <span class="n">ReorderableListGUI</span><span class="p">.</span><span class="nf">ListField</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">shoppingListProperty</span><span class="p">);</span>
+ 
+    <span class="n">ReorderableListGUI</span><span class="p">.</span><span class="nf">Title</span><span class="p">(</span><span class="s">"Purchased Items"</span><span class="p">);</span>
+    <span class="n">ReorderableListGUI</span><span class="p">.</span><span class="nf">ListField</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">purchasedListProperty</span><span class="p">,</span>
+        <span class="n">ReorderableListFlags</span><span class="p">.</span><span class="n">DisableReordering</span>
+      <span class="p">|</span> <span class="n">ReorderableListFlags</span><span class="p">.</span><span class="n">HideAddButton</span>
+    <span class="p">);</span>
+ 
+    <span class="k">this</span><span class="p">.</span><span class="n">serializedObject</span><span class="p">.</span><span class="nf">ApplyModifiedProperties</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+
+  </div>
+
+  
+</article>
+
+<nav class="post-meta-tags">
+  <h1 class="post-meta-tags__title">Tags:</h1>
+  <ul class="post-meta-tags__list">
+  
+  
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/csharp">csharp</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/dotnet">dotnet</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/imgui">imgui</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/mono">mono</a></li>
+    <li class="post-meta-tags__item"><a class="post-meta-tags__link" href="/tag/unity">unity</a></li>
+  </ul>
+</nav>
+
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer__wrap">
+    <h1 class="site-footer__title">Lea Hayes</h1>
+
+    <div class="site-footer_columns">
+      <div class="site-footer__column site-footer__column--social">
+        <ul class="social-media-list">
+
+  
+  <li class="social-media-list__item">
+    <a title="Twitter Profile" target="_blank" href="https://twitter.com/leahayes"><span class="icon icon--twitter"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#twitter"></use></svg></span><span class="username">leahayes</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="Github Profile" target="_blank" href="https://github.com/kruncher"><span class="icon icon--github"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#github"></use></svg></span><span class="username">kruncher</span></a>
+  </li>
+  
+
+  
+  <li class="social-media-list__item">
+    <a title="LinkedIn Profile" target="_blank" href="https://www.linkedin.com/in/lea-hayes"><span class="icon icon--linkedin"><svg class="svg-icon" xmlns="http://www.w3.org/2000/svg"><use xlink:href="/assets/icons.svg#linkedin"></use></svg></span><span class="username">lea-hayes</span></a>
+  </li>
+  
+
+</ul>
+
+      </div>
+
+      <div class="site-footer__column site-footer__column--description">
+        <p>Welcome to my personal domain where you can find my blog and take a look at some of the projects that I&#39;ve worked on.</p>
+      </div>
+    </div>
+
+    <small class="site-footer__copyright">©2009-2018 Lea Hayes. All rights reserved.</small>
+  </div>
+</footer>
+
+
+
+    <script src="/assets/js/gallery.js"></script>
+  </body>
+</html>
