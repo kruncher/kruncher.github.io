@@ -69,7 +69,7 @@
 
     <main class="main-content" aria-label="Content">
       <div class="main-content__wrap">
-        <article class="post">
+        <article id="cv" class="post">
 
   <header class="post__header">
     <h1 class="post__title">About</h1>
@@ -325,9 +325,11 @@ come to mind:</p>
   <li>Audacity</li>
 </ul>
 
-<h2 id="how-i-became-interested-in-software-development">How I became interested in software development</h2>
+<div class="extra-detail">
 
-<p>I got my very first computer (a Dragon 32) at age 6 which my grandad gave to me one
+  <h2 id="how-i-became-interested-in-software-development">How I became interested in software development</h2>
+
+  <p>I got my very first computer (a Dragon 32) at age 6 which my grandad gave to me one
 weekend when I went to visit him. My dad and I were really taken by this and spent
 countless hours playing some fairly tricky arcade games. Whilst a couple of the games that
 we had were on cassette tape, most of them were just source listings in books that we
@@ -335,54 +337,67 @@ would have to manually key in each time that we wanted to play them. At the time
 of us understood any of the code but we had a lot of fun trying to get these games to
 actually work.</p>
 
-<p>My dad bought me my first PC (an Intel 486) a couple of years later with a point-and-click
+  <p>My dad bought me my first PC (an Intel 486) a couple of years later with a point-and-click
 game creation program called <em>Klik &amp; Play</em> which was the first in a series of game
 development tools by <em>Clickteam</em>. Over the next 5 or so years my and my dad created quite
 a number of games using these tools in conjunction with other content creation tools such
 as 3D Studio Max, Photoshop, etc.</p>
 
-<p><a href="/assets/img/dad-game-screenshots.png" class="block-image-link"><img src="/assets/img/dad-game-screenshots.png" alt="Screenshots of some of the games that my father and I made" /></a></p>
+  <p><a href="/assets/img/dad-game-screenshots.png" class="block-image-link"><img src="/assets/img/dad-game-screenshots.png" alt="Screenshots of some of the games that my father and I made" /></a></p>
 
-<p class="caption">Some of the games that my father and I worked together on when I was a kid in the 90s.</p>
+  <p class="caption">Some of the games that my father and I worked together on when I was a kid in the 90s.</p>
 
-<p>I started to become curious as to how software worked and an old friend of the family
+  <p>I started to become curious as to how software worked and an old friend of the family
 introduced me to Visual Basic. My dad bought me some pretty chunky books so that I could
 learn how to create my own software. I stuck with Visual Basic for several years and then
 when we got the Internet I started to become aware of other programming languages and
 started to learn C and C++.</p>
 
-<p>After senior school I went to college to study computing with a focus on software
+  <p>After senior school I went to college to study computing with a focus on software
 development. My course tutors were very good in allowing me to focus on more complex and
 interesting topics whilst still fulfilling the requirements of the syllabus. I graduated
 college and moved on to study games and software development at university.</p>
 
-<p>After university I worked down the family camera store to help them through hard times
+  <p>After university I worked down the family camera store to help them through hard times
 and so was unable to begin my development on a professional level. Although this didn’t
 stop me from exercising my skills in my free time.</p>
 
-<h2 id="hobbies-and-interests">Hobbies and Interests</h2>
+  <h2 id="hobbies-and-interests">Hobbies and Interests</h2>
 
-<p>I enjoy playing video games, especially those that reward patience, mastery, and
+  <p>I enjoy playing video games, especially those that reward patience, mastery, and
 exploration. Dark Souls, Don’t Starve Together, and Hollow Knight are long‑time favourites;
 the kind of games that challenge you, surprise you, and stay with you long after you’ve
 put the controller down.</p>
 
-<p>I’ve always been drawn to creativity, whether that’s experimenting with graphics,
+  <p>I’ve always been drawn to creativity, whether that’s experimenting with graphics,
 sketching ideas, or building things just for the joy of it. My artistic skills aren’t as
 strong as my development skills, but I love learning new techniques and finding small ways
 to improve. Creating something visual from nothing still feels like magic.</p>
 
-<p>I also get a lot of satisfaction from helping others get started with software development.
+  <p>I also get a lot of satisfaction from helping others get started with software development.
 There’s something incredibly rewarding about seeing someone build their first project or
 solve a problem using skills you helped them develop.</p>
 
-<p>Outside of tech, I love travelling and exploring new places. Flying around the world and
+  <p>Outside of tech, I love travelling and exploring new places. Flying around the world and
 experiencing different cultures, landscapes, and food gives me a sense of perspective and
 inspiration that I bring back into my work and hobbies.</p>
 
+</div>
 
-    
   </div>
+
+  <a id="print-cv" class="button button--block" href="#cv" rel="nofollow">Print CV</a>
+  <script>
+    document.getElementById("print-cv").addEventListener("click", function (e) {
+      e.preventDefault();
+      const target = this.getAttribute("href");
+      window.location.hash = "cv";
+      setTimeout(function () {
+        window.print();
+        window.location.hash = "";
+      }, 50);
+    });
+  </script>
 
 </article>
 
